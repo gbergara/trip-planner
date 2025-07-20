@@ -59,7 +59,7 @@ msgstr "Booking deleted successfully!"
 msgid "failedToDelete"
 msgstr "Failed to delete booking."
 # English translations for Trip Planner
-# Copyright (C) 2024
+# Copyright (C) 2025
 # This file is distributed under the same license as the Trip Planner package.
 #
 msgid ""

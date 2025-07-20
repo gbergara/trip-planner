@@ -7,6 +7,18 @@ from typing import Optional
 import os
 
 from .core.database import get_db, create_tables
+import re
+# Utility to detect DB type for footer
+def get_db_type():
+    from .core.database import DATABASE_URL
+    url = DATABASE_URL.lower()
+    if "cockroach" in url or "26257" in url:
+        return "cockroachdb"
+    if "postgres" in url or "5432" in url:
+        return "postgresql"
+    if "sqlite" in url:
+        return "sqlite"
+    return "unknown"
 from .core.config import APP_NAME, APP_VERSION, APP_DESCRIPTION, TEMPLATES_DIR, STATIC_DIR
 from .models.booking import Trip, Booking
 from .models.user import User
@@ -120,7 +132,8 @@ async def home(
         "oauth_enabled": oauth_enabled,
         "language": language,
         "languages": get_language_names(),
-        "_": lambda text: _(text, language)
+        "_": lambda text: _(text, language),
+        "db_type": get_db_type()
     })
 
 @app.get("/start-guest")
@@ -167,7 +180,8 @@ async def login_page(request: Request, error: Optional[str] = None):
         "languages": get_language_names(),
         "error": error,
         "oauth_enabled": oauth_enabled,
-        "_": lambda text: _(text, language)
+        "_": lambda text: _(text, language),
+        "db_type": get_db_type()
     })
 
 @app.get("/trips", response_class=HTMLResponse)
@@ -183,7 +197,8 @@ async def trips_page(
         "current_user": current_user,
         "language": language,
         "languages": get_language_names(),
-        "_": lambda text: _(text, language)
+        "_": lambda text: _(text, language),
+        "db_type": get_db_type()
     })
 
 @app.get("/trips/{trip_id}/bookings", response_class=HTMLResponse)
@@ -223,7 +238,8 @@ async def trip_bookings_page(
         "current_user": current_user,
         "language": language,
         "languages": get_language_names(),
-        "_": lambda text: _(text, language)
+        "_": lambda text: _(text, language),
+        "db_type": get_db_type()
     })
 
 @app.get("/bookings", response_class=HTMLResponse)
@@ -235,7 +251,8 @@ async def bookings_page(request: Request):
         "request": request,
         "language": language,
         "languages": get_language_names(),
-        "_": lambda text: _(text, language)
+        "_": lambda text: _(text, language),
+        "db_type": get_db_type()
     })
 
 

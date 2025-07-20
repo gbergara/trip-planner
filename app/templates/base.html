@@ -135,7 +135,18 @@
     <!-- Footer -->
     <footer class="bg-light text-center py-3 mt-5">
         <div class="container">
-            <p class="text-muted mb-0">Trip Planner &copy; 2024 - Manage your travel bookings with ease</p>
+            <p class="text-muted mb-0">Trip Planner &copy; 2025 - Manage your travel bookings with ease</p>
+            <div class="mt-2">
+                {% if db_type == 'cockroachdb' %}
+                  Powered by <a href="https://www.cockroachlabs.com/" target="_blank" rel="noopener">CockroachDB</a>
+                {% elif db_type == 'postgresql' %}
+                  Powered by <a href="https://www.postgresql.org/" target="_blank" rel="noopener">PostgreSQL</a>
+                {% elif db_type == 'sqlite' %}
+                  Powered by <a href="https://www.sqlite.org/" target="_blank" rel="noopener">SQLite</a>
+                {% else %}
+                  Powered by Unknown DB
+                {% endif %}
+            </div>
         </div>
     </footer>
 
