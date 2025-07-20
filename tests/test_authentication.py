@@ -87,18 +87,21 @@ class TestGuestAuthentication:
 class TestGoogleOAuthFlow:
     """Test cases for Google OAuth2 authentication flow."""
     
-    @patch('app.services.auth_service.GoogleAuthService.oauth_enabled', True)
+    @patch('app.services.auth_service.auth_service.oauth_enabled', True)
     def test_oauth_login_redirect(self, client):
         """Test OAuth login redirects to Google."""
+        from fastapi.responses import RedirectResponse
+        
         with patch('app.services.auth_service.auth_service.get_authorization_url') as mock_auth_url:
-            mock_auth_url.return_value = Mock(
-                status_code=302,
-                headers={"location": "https://accounts.google.com/oauth/authorize?..."}
+            # Return a proper RedirectResponse instead of a Mock
+            mock_auth_url.return_value = RedirectResponse(
+                url="https://accounts.google.com/oauth/authorize?client_id=test&redirect_uri=http://testserver/auth/callback",
+                status_code=302
             )
             
             response = client.get("/auth/login", allow_redirects=False)
-            assert response.status_code == status.HTTP_302_FOUND or \
-                   response.status_code == status.HTTP_200_OK  # Depending on implementation
+            assert response.status_code == status.HTTP_302_FOUND
+            assert "accounts.google.com" in response.headers["location"]
     
     def test_oauth_disabled_endpoints(self, client):
         """Test OAuth endpoints when OAuth is disabled."""
@@ -114,7 +117,7 @@ class TestGoogleOAuthFlow:
         response = client.get("/auth/me")
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
     
-    @patch('app.services.auth_service.GoogleAuthService.oauth_enabled', True)
+    @patch('app.services.auth_service.auth_service.oauth_enabled', True)
     @patch('app.services.auth_service.auth_service.handle_callback')
     def test_oauth_callback_success(self, mock_handle_callback, client, db_session):
         """Test successful OAuth callback."""
@@ -137,7 +140,7 @@ class TestGoogleOAuthFlow:
         # Should set authentication cookie
         assert "access_token" in response.cookies
     
-    @patch('app.services.auth_service.GoogleAuthService.oauth_enabled', True)
+    @patch('app.services.auth_service.auth_service.oauth_enabled', True)
     @patch('app.services.auth_service.auth_service.handle_callback')
     def test_oauth_callback_error(self, mock_handle_callback, client):
         """Test OAuth callback with error."""
@@ -332,7 +335,7 @@ class TestAuthenticationUI:
         # Should not show Google login button
         assert "Continue with Google" not in content
     
-    @patch('app.services.auth_service.GoogleAuthService.oauth_enabled', True)
+    @patch('app.services.auth_service.auth_service.oauth_enabled', True)
     def test_login_page_oauth_enabled(self, client):
         """Test login page display when OAuth is enabled."""
         response = client.get("/login")

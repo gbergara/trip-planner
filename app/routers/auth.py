@@ -90,6 +90,12 @@ async def auth_login(request: Request):
 @router.get("/callback")
 async def auth_callback(request: Request, db: Session = Depends(get_db)):
     """Handle Google OAuth2 callback."""
+    if not auth_service.oauth_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Google OAuth2 is not configured"
+        )
+    
     try:
         # Handle the callback and get user information
         auth_data = await auth_service.handle_callback(request, db)

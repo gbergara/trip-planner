@@ -53,7 +53,6 @@ class TripBase(BaseModel):
     currency: str = "USD"
     traveler_count: int = 1
     notes: Optional[str] = None
-    guest_session_id: Optional[str] = None  # For guest users
 
 class TripCreate(TripBase):
     pass
@@ -73,6 +72,8 @@ class TripUpdate(BaseModel):
 
 class TripResponse(TripBase):
     id: UUID
+    user_id: Optional[UUID] = None  # For authenticated users
+    guest_session_id: Optional[str] = None  # For guest users
     created_at: datetime
     updated_at: datetime
     # bookings: List["BookingResponse"] = []  # Will be populated when needed

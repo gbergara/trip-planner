@@ -279,7 +279,7 @@ class TestAuthenticationAPI:
         assert "Google Authentication is not configured" in content
         assert "Start Using Trip Planner" in content
     
-    @patch('app.services.auth_service.GoogleAuthService.oauth_enabled', True)
+    @patch('app.services.auth_service.auth_service.oauth_enabled', True)
     def test_login_page_oauth_enabled(self, client):
         """Test login page when OAuth is enabled."""
         response = client.get("/login")

@@ -58,28 +58,37 @@ def client(db_session):
 
 
 @pytest.fixture
-def client_with_guest_session(client):
+def client_with_guest_session(db_session):
     """Create a test client with a guest session established."""
-    # Create a guest session by calling the start-guest endpoint
-    response = client.get("/start-guest", allow_redirects=False)
-    assert response.status_code == 302
-    # The client now has a guest session cookie
-    return client
+    # Create a new TestClient instance to ensure isolation
+    app.dependency_overrides[get_db] = override_get_db
+    
+    try:
+        with TestClient(app, base_url="http://testserver") as guest_client:
+            # Create a guest session by calling the start-guest endpoint
+            response = guest_client.get("/start-guest", allow_redirects=False)
+            assert response.status_code == 302
+            # The client now has a guest session cookie
+            yield guest_client
+    finally:
+        app.dependency_overrides.clear()
 
 
 @pytest.fixture
-def client_with_auth_user(client, db_session):
+def client_with_auth_user(db_session):
     """Create a test client with an authenticated user."""
     from app.models.user import User
     import uuid
     from app.services.auth_service import auth_service
+    from unittest.mock import patch
     
-    # Create a test user
+    # Create a test user with unique identifiers for each test
+    unique_suffix = str(uuid.uuid4())[-8:]  # Use last 8 chars of UUID for uniqueness
     user = User(
         id=uuid.uuid4(),
-        google_id="test_google_id_123",
-        email="test@example.com",
-        name="Test User",
+        google_id=f"test_google_id_{unique_suffix}",
+        email=f"test{unique_suffix}@example.com",
+        name=f"Test User {unique_suffix}",
         picture="https://example.com/avatar.jpg"
     )
     db_session.add(user)
@@ -87,16 +96,27 @@ def client_with_auth_user(client, db_session):
     db_session.refresh(user)
     
     # Create a mock JWT token for this user
-    from unittest.mock import patch
-    
     def mock_get_current_user(db, token):
         return user
     
-    # Patch the auth service to return our test user
-    with patch.object(auth_service, 'get_current_user', mock_get_current_user):
-        # Set a mock access_token cookie
-        client.cookies.set("access_token", "mock_jwt_token")
-        yield client, user
+    def mock_get_current_user_optional(request, db):
+        return user
+    
+    # Create a new TestClient instance to ensure isolation  
+    app.dependency_overrides[get_db] = override_get_db
+    
+    try:
+        with TestClient(app, base_url="http://testserver") as auth_client:
+            # Patch both auth dependency functions
+            with patch('app.routers.auth.get_current_user', return_value=user), \
+                 patch('app.routers.auth.get_current_user_optional', return_value=user), \
+                 patch.object(auth_service, 'get_current_user', mock_get_current_user):
+                
+                # Set a mock access_token cookie
+                auth_client.cookies.set("access_token", "mock_jwt_token")
+                yield auth_client, user
+    finally:
+        app.dependency_overrides.clear()
 
 
 @pytest.fixture
