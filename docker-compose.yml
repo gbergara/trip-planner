@@ -6,8 +6,8 @@ services:
     container_name: trip-planner-app
     ports:
       - "8000:8000"
-    volumes:
-      - ./app:/app/app    # Mount source for development (optional)
+    # volumes:
+    #   - ./app:/app/app    # Mount source for development (optional)
     environment:
       - ENVIRONMENT=production
       - DATABASE_URL=cockroachdb://root@cockroachdb:26257/trip_planner?sslmode=disable
@@ -88,16 +88,17 @@ services:
         condition: service_completed_successfully
     restart: "no"
 
-  # Optional: Redis for caching and sessions
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: trip-planner-redis
-  #   restart: unless-stopped
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
+  redis:
+    image: redis:7-alpine
+    container_name: trip-planner-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   cockroach_data:  # CockroachDB data volume

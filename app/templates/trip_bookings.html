@@ -3,6 +3,7 @@
 {% block title %}{{ trip.name }} - Bookings{% endblock %}
 
 {% block content %}
+<div>TEST-TRIP-BOOKINGS-TEMPLATE</div>
 <div class="container-fluid py-4">
     <!-- Trip Header -->
     <div class="row mb-4">
@@ -207,11 +208,13 @@
                         </div>
                         <div class="col-md-6">
                             <label for="departure_location" class="form-label">Departure Location</label>
-                            <input type="text" class="form-control" id="departure_location" name="departure_location">
+                            <input type="text" class="form-control airport-autocomplete" id="departure_location" name="departure_location" autocomplete="off" placeholder="Type to search airport...">
+                            <div class="autocomplete-dropdown" id="departure_location_dropdown"></div>
                         </div>
                         <div class="col-md-6">
                             <label for="arrival_location" class="form-label">Arrival Location</label>
-                            <input type="text" class="form-control" id="arrival_location" name="arrival_location">
+                            <input type="text" class="form-control airport-autocomplete" id="arrival_location" name="arrival_location" autocomplete="off" placeholder="Type to search airport...">
+                            <div class="autocomplete-dropdown" id="arrival_location_dropdown"></div>
                         </div>
                         <div class="col-md-6">
                             <label for="confirmation_number" class="form-label">Confirmation Number</label>
@@ -294,7 +297,67 @@
 }
 </style>
 
+{% block extra_scripts %}
 <script>
+// --- Airport Autocomplete ---
+function setupAirportAutocomplete(inputId, dropdownId) {
+    const input = document.getElementById(inputId);
+    const dropdown = document.getElementById(dropdownId);
+    let debounceTimeout = null;
+
+    if (!input || !dropdown) {
+        console.warn('Autocomplete: input or dropdown not found:', inputId, dropdownId);
+        return;
+    }
+    input.addEventListener('input', function () {
+        const query = input.value.trim();
+        if (debounceTimeout) clearTimeout(debounceTimeout);
+        if (query.length < 2) {
+            dropdown.innerHTML = '';
+            dropdown.style.display = 'none';
+            return;
+        }
+        debounceTimeout = setTimeout(() => {
+            fetch(`/api/airports/search?q=${encodeURIComponent(query)}`)
+                .then(res => res.json())
+                .then(data => {
+                    dropdown.innerHTML = '';
+                    if (data && data.length > 0) {
+                        data.forEach(airport => {
+                            const item = document.createElement('div');
+                            item.className = 'autocomplete-item';
+                            item.textContent = `${airport.name} (${airport.iata}) - ${airport.city}, ${airport.country}`;
+                            item.dataset.iata = airport.iata;
+                            item.addEventListener('mousedown', function (e) {
+                                e.preventDefault();
+                                input.value = `${airport.name} (${airport.iata})`;
+                                dropdown.innerHTML = '';
+                                dropdown.style.display = 'none';
+                            });
+                            dropdown.appendChild(item);
+                        });
+                        dropdown.style.display = 'block';
+                    } else {
+                        dropdown.style.display = 'none';
+                    }
+                })
+                .catch(() => {
+                    dropdown.innerHTML = '';
+                    dropdown.style.display = 'none';
+                });
+        }, 250);
+    });
+
+    input.addEventListener('blur', function () {
+        setTimeout(() => {
+            dropdown.innerHTML = '';
+            dropdown.style.display = 'none';
+        }, 150);
+    });
+}
+window.setupAirportAutocomplete = setupAirportAutocomplete;
+
+console.log('Trip bookings JS loaded');
 // Global variables
 let currentBookings = [];
 let editingBookingId = null;
@@ -302,9 +365,9 @@ const tripId = "{{ trip.id }}";
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded fired in trip_bookings.html');
     loadBookings();
     setupEventListeners();
-    
     // Set trip_id in form as hidden field or use tripId variable
     const form = document.getElementById('bookingForm');
     if (form && !form.querySelector('input[name="trip_id"]')) {
@@ -314,6 +377,9 @@ document.addEventListener('DOMContentLoaded', function() {
         tripIdInput.value = tripId;
         form.appendChild(tripIdInput);
     }
+    // Add airport autocomplete logic (from bookings.js)
+    setupAirportAutocomplete('departure_location', 'departure_location_dropdown');
+    setupAirportAutocomplete('arrival_location', 'arrival_location_dropdown');
 });
 
 // Setup event listeners
@@ -1028,7 +1094,13 @@ document.addEventListener('DOMContentLoaded', function() {
         todoForm.addEventListener('submit', handleTodoFormSubmit);
     }
 });
+// --- Airport Autocomplete ---
+// Make modal functions globally accessible
+window.showCreateBookingModal = showCreateBookingModal;
+window.editBooking = editBooking;
+window.deleteBooking = deleteBooking;
 </script>
+{% endblock %}
 
 <!-- TODO Modal -->
 <div class="modal fade" id="todoModal" tabindex="-1">

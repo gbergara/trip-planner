@@ -111,10 +111,12 @@
                         <div class="col-md-6">
                             <label for="departure_location" class="form-label" id="departure_location_label">{% if _ %}{{ _("Departure Location") }}{% else %}Departure Location{% endif %}</label>
                             <input type="text" class="form-control" id="departure_location" name="departure_location" placeholder="">
+                            <div id="departure_location_dropdown" class="autocomplete-dropdown"></div>
                         </div>
                         <div class="col-md-6">
                             <label for="arrival_location" class="form-label" id="arrival_location_label">{% if _ %}{{ _("Arrival Location") }}{% else %}Arrival Location{% endif %}</label>
                             <input type="text" class="form-control" id="arrival_location" name="arrival_location" placeholder="">
+                            <div id="arrival_location_dropdown" class="autocomplete-dropdown"></div>
                         </div>
                         <div class="col-md-6">
                             <label for="status" class="form-label">{% if _ %}{{ _("Status") }}{% else %}Status{% endif %}</label>
@@ -146,6 +148,16 @@
                         <!-- Type-specific fields -->
                         <!-- Flight specific fields -->
                         <div id="flight-fields" style="display: none;">
+                            <div class="col-md-6">
+                                <label for="departure_location" class="form-label">{% if _ %}{{ _('Departure Airport') }}{% else %}Departure Airport{% endif %}</label>
+                                <input type="text" class="form-control airport-autocomplete" id="departure_location" name="departure_location" autocomplete="off" placeholder="{% if _ %}{{ _('Type to search airport...') }}{% else %}Type to search airport...{% endif %}">
+                                <div class="autocomplete-dropdown" id="departure_location_dropdown"></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="arrival_location" class="form-label">{% if _ %}{{ _('Arrival Airport') }}{% else %}Arrival Airport{% endif %}</label>
+                                <input type="text" class="form-control airport-autocomplete" id="arrival_location" name="arrival_location" autocomplete="off" placeholder="{% if _ %}{{ _('Type to search airport...') }}{% else %}Type to search airport...{% endif %}">
+                                <div class="autocomplete-dropdown" id="arrival_location_dropdown"></div>
+                            </div>
                             <div class="col-md-6">
                                 <label for="flight_number" class="form-label">{% if _ %}{{ _("Flight Number") }}{% else %}Flight Number{% endif %}</label>
                                 <input type="text" class="form-control" id="flight_number" name="flight_number">
