@@ -9,9 +9,52 @@ import os
 from typing import List
 
 # Application settings
-APP_NAME = "Trip Planner"
-APP_VERSION = "1.0.0"
-APP_DESCRIPTION = "A comprehensive trip planning application for managing flights, accommodations, and other bookings"
+APP_NAME = "Trip Planner API"
+APP_VERSION = "2.1.0"
+APP_DESCRIPTION = """
+🧳 **Trip Planner** - A comprehensive travel management platform with intelligent booking organization.
+
+## ✨ **Key Features**
+
+### 🛫 **Smart Flight Management**
+- **Auto-generated titles** in "Source → Destination" format
+- **Intelligent flight grouping** by date with connection time analysis
+- **Color-coded warnings** for tight connections (Red ≤1hr, Yellow ≤2hrs, Green >2hrs)
+- **Airline tracking** with dedicated fields for flight bookings
+
+### 🌍 **Global Timezone Support**
+- **TIMESTAMPTZ database fields** for accurate worldwide datetime handling
+- **Alembic migrations** for professional schema management with rollback support
+- **No date drift** - consistent timezone handling between frontend and backend
+
+### 📋 **Integrated TODO System**
+- **Task management** within each trip with due dates and priorities
+- **7 categories**: Flight, Accommodation, Transport, Activity, Documents, Packing, Other
+- **3-level priority system** with visual indicators and completion tracking
+
+### 🔐 **Flexible Authentication**
+- **Google OAuth2** integration for permanent account sync
+- **Guest mode** with 30-day session storage for quick access
+- **Cross-device syncing** for authenticated users
+
+### 🎯 **Enhanced User Experience**
+- **Multi-language support** (English, Spanish) with browser detection
+- **PDF trip reports** with comprehensive booking summaries
+- **Mobile-optimized** responsive design with modern UI
+- **Real-time validation** and smart form defaults
+
+### 🏗️ **Professional Architecture**
+- **Three-database strategy**: SQLite (dev), PostgreSQL (test), CockroachDB (prod)
+- **Service layer architecture** with clean separation of concerns
+- **Comprehensive testing** with 95+ test coverage
+- **Docker containerization** with development and production configurations
+
+## 📊 **API Capabilities**
+- **RESTful endpoints** for trips, bookings, todos, and authentication
+- **UUID-based identifiers** with proper database constraints
+- **JSON responses** with comprehensive error handling
+- **OpenAPI 3.0 specification** with interactive documentation
+"""
 
 # Environment settings
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")

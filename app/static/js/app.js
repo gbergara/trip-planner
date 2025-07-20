@@ -126,7 +126,23 @@ const TripPlanner = {
                 throw new Error(errorMsg);
             }
 
-            return await response.json();
+            // Handle responses with no content (like 204 No Content)
+            if (response.status === 204 || response.headers.get('content-length') === '0') {
+                return null;
+            }
+
+            // Try to parse as JSON, but handle empty responses gracefully
+            const text = await response.text();
+            if (!text) {
+                return null;
+            }
+
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.warn('Response is not valid JSON:', text);
+                return text;
+            }
         },
 
         get: function(url) {

@@ -73,7 +73,21 @@ router = APIRouter(
 
 @router.get("/login")
 async def auth_login(request: Request):
-    """Initiate Google OAuth2 login."""
+    """
+    Initiate Google OAuth2 authentication flow.
+    
+    **Process:**
+    1. Redirects user to Google's authorization server
+    2. User grants permissions on Google's site
+    3. Google redirects back to `/auth/callback` with authorization code
+    4. System exchanges code for tokens and creates user session
+    
+    **Requirements:**
+    - Google OAuth2 must be configured with GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+    
+    **Returns**: Redirect response to Google's authorization URL
+    **Error**: 503 Service Unavailable if OAuth is not configured
+    """
     if not auth_service.oauth_enabled:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -88,8 +102,25 @@ async def auth_login(request: Request):
 
 
 @router.get("/callback")
-async def auth_callback(request: Request, db: Session = Depends(get_db)):
-    """Handle Google OAuth2 callback."""
+async def auth_callback(request: Request, response: Response, db: Session = Depends(get_db)):
+    """
+    Handle Google OAuth2 callback and create user session.
+    
+    **Process:**
+    1. Receives authorization code from Google
+    2. Exchanges code for access tokens
+    3. Fetches user profile information from Google
+    4. Creates or updates user record in database
+    5. Issues JWT session token via HTTP-only cookie
+    
+    **Security:**
+    - Uses HTTP-only cookies to prevent XSS attacks
+    - JWT tokens are signed with application secret
+    - User profile is validated before account creation
+    
+    **Returns**: Redirect to home page with active session
+    **Errors**: 401 for authentication failures, 500 for server errors
+    """
     if not auth_service.oauth_enabled:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -101,10 +132,10 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
         auth_data = await auth_service.handle_callback(request, db)
         
         # Create response with redirect to home page
-        response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+        redirect_response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
         
         # Set the access token as an HTTP-only cookie
-        response.set_cookie(
+        redirect_response.set_cookie(
             key="access_token",
             value=auth_data["access_token"],
             httponly=True,
@@ -113,7 +144,7 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
             max_age=60 * 60 * 24 * 7  # 7 days
         )
         
-        return response
+        return redirect_response
         
     except Exception as e:
         # Redirect to login page with error
@@ -125,7 +156,18 @@ async def auth_callback(request: Request, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 async def logout(response: Response, current_user: Optional[User] = Depends(get_current_user_optional)):
-    """Logout the current user."""
+    """
+    Logout the current authenticated user.
+    
+    **Process:**
+    1. Validates that user is currently authenticated
+    2. Clears the session cookie
+    3. Invalidates the JWT token
+    
+    **Security**: Requires active authentication session
+    **Effect**: User will need to re-authenticate for protected endpoints
+    **Returns**: Success message confirming logout
+    """
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -151,7 +193,17 @@ async def logout_get():
 
 @router.get("/me", response_model=CurrentUser)
 async def get_current_user_info(current_user: Optional[User] = Depends(get_current_user_optional)):
-    """Get information about the current authenticated user."""
+    """
+    Get information about the current authenticated user.
+    
+    **Returns:**
+    - User ID, name, email
+    - Account creation date
+    - Authentication status
+    
+    **Security**: Requires active authentication session
+    **Use Case**: User profile display, authentication status checks
+    """
     if not current_user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

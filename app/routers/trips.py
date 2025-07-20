@@ -32,7 +32,25 @@ def create_trip(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Create a new trip (for authenticated users or guests)"""
+    """
+    Create a new trip with automatic user association.
+    
+    **Features:**
+    - **Automatic Ownership**: Associates trip with authenticated user or guest session
+    - **Timezone Support**: All datetime fields use timezone-aware storage
+    - **Flexible Access**: Works for both authenticated users and guest sessions
+    
+    **Required Fields:**
+    - **name**: Trip title/name
+    - **start_date**: Trip start date (ISO 8601 format)
+    
+    **Optional Fields:**
+    - **description**: Trip description/notes
+    - **end_date**: Trip end date
+    - **destinations**: JSON string of destinations
+    - **budget**: Estimated trip budget
+    - **currency**: Budget currency (default: USD)
+    """
     trip_data = trip.model_dump()
     
     if current_user:
@@ -61,7 +79,18 @@ def list_trips(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """List user's trips (authenticated users) or guest trips (guest users)"""
+    """
+    List user's trips with pagination support.
+    
+    **Features:**
+    - **Pagination**: Configurable skip/limit parameters
+    - **User-Specific**: Only returns trips belonging to current user/session
+    - **Ordering**: Results ordered by creation date (newest first)
+    
+    **Parameters:**
+    - **skip**: Number of records to skip (default: 0)
+    - **limit**: Maximum records to return (default: 100, max: 100)
+    """
     if current_user:
         # Authenticated user - show their trips
         trips = db.query(Trip).filter(
@@ -85,7 +114,12 @@ def get_trip(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Get a specific trip by ID"""
+    """
+    Get detailed information for a specific trip.
+    
+    **Security**: Only returns trips belonging to the current user or guest session.
+    **UUID Format**: trip_id must be a valid UUID string.
+    """
     if current_user:
         # Authenticated user - check their trips
         trip = db.query(Trip).filter(
@@ -113,7 +147,16 @@ def get_trip_bookings(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Get all bookings for a specific trip"""
+    """
+    Get all bookings associated with a specific trip.
+    
+    **Features:**
+    - **Complete Booking Details**: Returns full booking information
+    - **Intelligent Grouping**: Frontend can group flights by date
+    - **Security**: Only accessible by trip owner
+    
+    **Use Case**: Primary endpoint for trip booking management pages.
+    """
     if current_user:
         trip = db.query(Trip).filter(
             Trip.id == trip_id, 
@@ -142,7 +185,16 @@ def update_trip(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Update a trip"""
+    """
+    Update an existing trip with partial field updates.
+    
+    **Features:**
+    - **Partial Updates**: Only specified fields are modified
+    - **Validation**: Automatic data validation and type checking
+    - **Security**: Only trip owner can update their trips
+    
+    **Updatable Fields**: All trip fields except ID and ownership
+    """
     if current_user:
         db_trip = db.query(Trip).filter(
             Trip.id == trip_id, 
@@ -176,7 +228,17 @@ def delete_trip(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Delete a trip"""
+    """
+    Permanently delete a trip and all associated data.
+    
+    **Warning**: This action cannot be undone and will delete:
+    - The trip record
+    - All associated bookings
+    - All associated TODO items
+    
+    **Security**: Only trip owner can delete their trips.
+    **Response**: Returns success message on completion.
+    """
     if current_user:
         db_trip = db.query(Trip).filter(
             Trip.id == trip_id, 
@@ -205,7 +267,22 @@ def export_trip_pdf(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Export trip details as PDF"""
+    """
+    Export trip details as a professionally formatted PDF report.
+    
+    **Features:**
+    - **Complete Trip Summary**: Includes all trip details and bookings
+    - **Professional Format**: Well-structured PDF with tables and styling
+    - **Automatic Download**: Returns PDF file for immediate download
+    
+    **Content Includes:**
+    - Trip overview and dates
+    - Complete booking itinerary
+    - Financial summary with totals
+    - Contact information and confirmations
+    
+    **File Format**: PDF with filename pattern: trip_[name].pdf
+    """
     if current_user:
         trip = db.query(Trip).options(
             joinedload(Trip.bookings)
@@ -246,7 +323,18 @@ def update_trip_status(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Update trip status"""
+    """
+    Update trip status for progress tracking.
+    
+    **Available Statuses:**
+    - **planning**: Trip is being planned (default)
+    - **confirmed**: Trip bookings are confirmed
+    - **in_progress**: Trip is currently happening
+    - **completed**: Trip has finished
+    - **cancelled**: Trip was cancelled
+    
+    **Use Case**: Track trip lifecycle and display appropriate UI states.
+    """
     if current_user:
         db_trip = db.query(Trip).filter(
             Trip.id == trip_id, 
@@ -283,7 +371,17 @@ def get_trip_todos(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Get all todos for a specific trip."""
+    """
+    Get all TODO items for a specific trip.
+    
+    **Features:**
+    - **Organized Tasks**: Returns tasks ordered by priority then creation date
+    - **Complete Information**: Includes due dates, categories, and completion status
+    - **7 Categories**: Flight, Accommodation, Transport, Activity, Documents, Packing, Other
+    
+    **Security**: Only accessible by trip owner.
+    **Ordering**: High priority first, then by creation date.
+    """
     # Find the trip and verify access
     query = db.query(Trip)
     if current_user:
@@ -310,7 +408,24 @@ def create_todo(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Create a new todo for a trip."""
+    """
+    Create a new TODO item for a trip.
+    
+    **Features:**
+    - **Flexible Categories**: Choose from 7 predefined categories
+    - **Priority System**: 3 levels (1=High, 2=Medium, 3=Low)
+    - **Due Date Support**: Optional due date with timezone awareness
+    - **Auto-Assignment**: Automatically associates with the specified trip
+    
+    **Required Fields:**
+    - **title**: Task description
+    - **category**: One of the 7 available categories
+    
+    **Optional Fields:**
+    - **description**: Detailed task notes
+    - **priority**: Priority level (default: 2=Medium)
+    - **due_date**: When the task should be completed
+    """
     # Find the trip and verify access
     query = db.query(Trip)
     if current_user:
@@ -347,7 +462,20 @@ def update_todo(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Update a todo."""
+    """
+    Update an existing TODO item.
+    
+    **Features:**
+    - **Partial Updates**: Only specified fields are modified
+    - **Smart Completion**: Automatically sets completion timestamp when marked complete
+    - **Security**: Only accessible by trip owner
+    
+    **Special Behavior:**
+    - **Completion Tracking**: Setting completed=true records completion timestamp
+    - **Reopening Tasks**: Setting completed=false clears completion timestamp
+    
+    **Updatable Fields**: All TODO fields except ID and creation date.
+    """
     # Find the todo and verify access through the trip
     db_todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if db_todo is None:
@@ -389,7 +517,13 @@ def delete_todo(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """Delete a todo."""
+    """
+    Permanently delete a TODO item.
+    
+    **Security**: Only the trip owner can delete TODO items from their trips.
+    **Warning**: This action cannot be undone.
+    **Response**: Returns 204 No Content on successful deletion.
+    """
     # Find the todo and verify access through the trip
     db_todo = db.query(Todo).filter(Todo.id == todo_id).first()
     if db_todo is None:

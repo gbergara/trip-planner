@@ -19,7 +19,47 @@ from .services.pdf_service import create_trip_pdf
 app = FastAPI(
     title=APP_NAME,
     description=APP_DESCRIPTION,
-    version=APP_VERSION
+    version=APP_VERSION,
+    contact={
+        "name": "Trip Planner API",
+        "url": "https://github.com/your-repo/trip-planner",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    openapi_tags=[
+        {
+            "name": "trips",
+            "description": "**Trip Management** - Create, read, update, and delete trips with full CRUD operations. Includes trip statistics, PDF exports, and TODO list management.",
+        },
+        {
+            "name": "bookings",
+            "description": "**Booking Management** - Handle flights, accommodations, car rentals, activities and other travel bookings. Features automatic flight title generation and intelligent grouping.",
+        },
+        {
+            "name": "authentication", 
+            "description": "**User Authentication** - Google OAuth2 integration with guest session support. Manage user accounts and session tokens.",
+        },
+        {
+            "name": "trips-api",
+            "description": "**Trip API (Legacy)** - Backward compatibility endpoints for trip operations without /api prefix.",
+        },
+        {
+            "name": "bookings-api", 
+            "description": "**Booking API (Legacy)** - Backward compatibility endpoints for booking operations without /api prefix.",
+        },
+    ],
+    servers=[
+        {
+            "url": "/",
+            "description": "Production server"
+        },
+        {
+            "url": "http://localhost:8000",
+            "description": "Development server"
+        },
+    ],
 )
 
 # Database tables are now managed by Alembic migrations

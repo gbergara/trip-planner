@@ -159,6 +159,9 @@
                         <div class="col-md-8">
                             <label for="title" class="form-label">Title *</label>
                             <input type="text" class="form-control" id="title" name="title" required>
+                            <div id="flight_title_info" class="form-text text-info" style="display: none;">
+                                <i class="bi bi-info-circle"></i> Flight title will be auto-generated from departure and arrival locations
+                            </div>
                         </div>
                         <div class="col-md-4">
                             <label for="booking_type" class="form-label">Type *</label>
@@ -327,19 +330,52 @@ function setupEventListeners() {
     document.getElementById('booking_type').addEventListener('change', function() {
         toggleAirlineField();
     });
+    
+    // Auto-generate flight titles when locations change
+    document.getElementById('departure_location').addEventListener('input', generateFlightTitle);
+    document.getElementById('arrival_location').addEventListener('input', generateFlightTitle);
 }
 
-// Toggle airline field visibility based on booking type
+// Toggle airline field visibility and flight title behavior based on booking type
 function toggleAirlineField() {
     const bookingType = document.getElementById('booking_type').value;
     const airlineField = document.getElementById('airline_field');
+    const titleField = document.getElementById('title');
+    const titleInfo = document.getElementById('flight_title_info');
     
     if (bookingType === 'flight') {
         airlineField.style.display = 'block';
+        titleField.readOnly = true;
+        titleField.placeholder = 'Auto-generated from locations';
+        titleInfo.style.display = 'block';
+        // Generate title immediately if locations are available
+        generateFlightTitle();
     } else {
         airlineField.style.display = 'none';
+        titleField.readOnly = false;
+        titleField.placeholder = '';
+        titleInfo.style.display = 'none';
         // Clear airline field when not a flight
         document.getElementById('airline').value = '';
+    }
+}
+
+// Generate flight title from departure and arrival locations
+function generateFlightTitle() {
+    const bookingType = document.getElementById('booking_type').value;
+    if (bookingType !== 'flight') return;
+    
+    const departureLocation = document.getElementById('departure_location').value.trim();
+    const arrivalLocation = document.getElementById('arrival_location').value.trim();
+    const titleField = document.getElementById('title');
+    
+    if (departureLocation && arrivalLocation) {
+        titleField.value = `${departureLocation} → ${arrivalLocation}`;
+    } else if (departureLocation || arrivalLocation) {
+        // If only one location is available, use it as a placeholder
+        titleField.value = departureLocation || arrivalLocation;
+    } else {
+        titleField.value = '';
     }
 }
 
@@ -669,7 +705,7 @@ function showCreateBookingModal() {
     document.getElementById('start_date').value = startDateTime;
     document.getElementById('end_date').value = endDateTime;
     
-    // Show/hide airline field based on default booking type
+    // Show/hide airline field and set up title behavior based on default booking type
     toggleAirlineField();
     
     const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
@@ -697,8 +733,13 @@ async function editBooking(bookingId) {
         document.getElementById('airline').value = booking.airline || '';
         document.getElementById('notes').value = booking.notes || '';
         
-        // Show/hide airline field based on booking type
+        // Show/hide airline field and handle title generation based on booking type
         toggleAirlineField();
+        
+        // For flights, regenerate title after populating locations (in case it needs updating)
+        if (booking.booking_type === 'flight') {
+            generateFlightTitle();
+        }
         
         // Handle start_date
         if (booking.start_date) {
@@ -750,6 +791,12 @@ function deleteBooking(bookingId) {
 // Handle form submission
 async function handleFormSubmit(e) {
     e.preventDefault();
+    
+    // For flights, ensure title is generated from locations before submitting
+    const bookingType = document.getElementById('booking_type').value;
+    if (bookingType === 'flight') {
+        generateFlightTitle();
+    }
     
     const formData = new FormData(e.target);
     const bookingData = {};
