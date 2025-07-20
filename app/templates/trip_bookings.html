@@ -480,9 +480,14 @@ function renderBookings(bookings) {
         `;
         return;
     }
-    
     // Group flights by date and render with time differences
-    const groupedBookings = groupFlightsByDate(bookings);
+    let groupedBookings = groupFlightsByDate(bookings);
+    // Sort groups by date (earliest to latest)
+    groupedBookings.sort((a, b) => {
+        const aDate = a.type === 'flight-group' ? new Date(a.date) : new Date(a.booking.start_date || 0);
+        const bDate = b.type === 'flight-group' ? new Date(b.date) : new Date(b.booking.start_date || 0);
+        return aDate - bDate;
+    });
     container.innerHTML = groupedBookings.map(group => createBookingGroup(group)).join('');
 }
 
@@ -556,7 +561,8 @@ function groupFlightsByDate(bookings) {
         });
     });
     
-    // Add other bookings as individual items
+    // Add other bookings as individual items, sorted by start_date
+    otherBookings.sort((a, b) => new Date(a.start_date || 0) - new Date(b.start_date || 0));
     otherBookings.forEach(booking => {
         groups.push({
             type: 'single',
