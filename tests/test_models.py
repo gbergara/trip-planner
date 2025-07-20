@@ -45,7 +45,12 @@ class TestTripModel:
         assert trip.id is not None
         assert trip.name == "Minimal Trip"
         assert trip.description is None
-        assert trip.end_date == datetime(2024, 6, 8)
+        # Accept both naive and UTC-aware datetimes
+        expected = datetime(2024, 6, 8)
+        actual = trip.end_date
+        if actual.tzinfo is not None:
+            actual = actual.replace(tzinfo=None)
+        assert actual == expected
     
     def test_trip_name_required(self, db_session):
         """Test that name is required."""

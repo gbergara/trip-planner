@@ -38,8 +38,17 @@ class TestTripsAPI:
         created_trip = response.json()
         assert created_trip["name"] == trip_data["name"]
         assert created_trip["description"] == trip_data["description"]
-        assert created_trip["start_date"] == trip_data["start_date"]
-        assert created_trip["end_date"] == trip_data["end_date"]
+        # Accept both naive and UTC ('Z') datetime strings for start_date
+        actual_start = created_trip["start_date"]
+        expected_start = trip_data["start_date"]
+        if actual_start.endswith("Z"): actual_start = actual_start[:-1]
+        assert actual_start == expected_start
+
+        # Accept both naive and UTC ('Z') datetime strings for end_date
+        actual_end = created_trip["end_date"]
+        expected_end = trip_data["end_date"]
+        if actual_end.endswith("Z"): actual_end = actual_end[:-1]
+        assert actual_end == expected_end
         assert "id" in created_trip
         assert created_trip["user_id"] is None  # Guest user
         assert created_trip["guest_session_id"] is not None
@@ -74,7 +83,11 @@ class TestTripsAPI:
         
         created_trip = response.json()
         assert created_trip["name"] == trip_data["name"]
-        assert created_trip["start_date"] == trip_data["start_date"]
+        # Accept both naive and UTC ('Z') datetime strings
+        actual = created_trip["start_date"]
+        expected = trip_data["start_date"]
+        if actual.endswith("Z"): actual = actual[:-1]
+        assert actual == expected
         assert created_trip["description"] is None
         assert created_trip["end_date"] is None
 

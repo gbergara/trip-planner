@@ -11,7 +11,7 @@ from .core.config import APP_NAME, APP_VERSION, APP_DESCRIPTION, TEMPLATES_DIR, 
 from .models.booking import Trip, Booking
 from .models.user import User
 from .routers import bookings, trips, auth
-from .routers import airports, airlines
+from .routers import airports
 from .routers.auth import get_current_user_optional
 from .services.i18n_service import translate as _, detect_language_from_request, get_language_names, get_supported_languages
 from .services.pdf_service import create_trip_pdf
@@ -70,14 +70,14 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 # Set up templates
 templates = Jinja2Templates(directory=TEMPLATES_DIR)
 
+
 # Include API routers with /api prefix first
-app.include_router(trips.router, prefix="/api")
-app.include_router(bookings.router, prefix="/api")
-app.include_router(airports.router, prefix="/api/airports")
-app.include_router(airlines.router, prefix="/api/airlines")
+app.include_router(trips, prefix="/api")
+app.include_router(bookings, prefix="/api")
+app.include_router(airports, prefix="/api/airports")
 
 # Include authentication router
-app.include_router(auth.router)
+app.include_router(auth)
 
 @app.get("/", response_class=HTMLResponse)
 async def home(

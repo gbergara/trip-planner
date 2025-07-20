@@ -18,8 +18,14 @@ RUN apt-get update \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+
 # Copy application code
 COPY app/ ./app/
+
+# Compile .po to .mo and sync mtimes for translation files
+RUN apt-get update && apt-get install -y gettext && \
+    find app/locales -name "messages.po" -exec sh -c 'msgfmt "$0" -o "${0%.po}.mo" && touch -r "$0" "${0%.po}.mo"' {} \; && \
+    apt-get remove -y gettext && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 # Copy tests and configuration
 COPY tests/ ./tests/
