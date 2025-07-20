@@ -243,6 +243,12 @@ msgstr "Total de Viajes"
 msgid "New Trip"
 msgstr "Nuevo Viaje"
 
+msgid "No trips yet."
+msgstr "Aún no hay viajes."
+
+msgid "Plan your first trip!"
+msgstr "¡Planifica tu primer viaje!"
+
 msgid "View All"
 msgstr "Ver Todo"
 
@@ -451,4 +457,58 @@ msgid "Invalid authentication credentials"
 msgstr "Credenciales de autenticación inválidas"
 
 msgid "Session expired"
-msgstr "Sesión expirada" 
+msgstr "Sesión expirada"
+
+# Login page features
+msgid "Secure authentication with Google"
+msgstr "Autenticación segura con Google"
+
+msgid "Organize trips and bookings"
+msgstr "Organiza viajes y reservas"
+
+msgid "Export professional PDF reports"
+msgstr "Exporta informes PDF profesionales"
+
+msgid "Multi-language support"
+msgstr "Soporte multiidioma"
+
+msgid "Your personal travel companion"
+msgstr "Tu compañero personal de viajes"
+
+msgid "Keep all your travel plans organized in one place. From flights to hotels, manage everything with ease."
+msgstr "Mantén todos tus planes de viaje organizados en un solo lugar. Desde vuelos hasta hoteles, gestiona todo con facilidad."
+
+# Trips page JavaScript messages
+msgid "No trips planned yet"
+msgstr "Aún no hay viajes planeados"
+
+msgid "Start planning your next adventure by creating your first trip."
+msgstr "Comienza a planear tu próxima aventura creando tu primer viaje."
+
+msgid "Plan Your First Trip"
+msgstr "Planea Tu Primer Viaje"
+
+# Loading and JavaScript messages
+msgid "Loading..."
+msgstr "Cargando..."
+
+msgid "travelers"
+msgstr "viajeros"
+
+msgid "days until departure"
+msgstr "días hasta la salida"
+
+msgid "Trip completed"
+msgstr "Viaje completado"
+
+msgid "Trip in progress!"
+msgstr "¡Viaje en progreso!"
+
+msgid "Budget:"
+msgstr "Presupuesto:"
+
+msgid "Created"
+msgstr "Creado"
+
+msgid "View Bookings"
+msgstr "Ver Reservas" 

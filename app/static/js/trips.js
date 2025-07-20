@@ -71,10 +71,10 @@ function displayTrips(trips) {
         container.innerHTML = `
             <div class="empty-state">
                 <i class="bi bi-map"></i>
-                <h5>No trips planned yet</h5>
-                <p>Start planning your next adventure by creating your first trip.</p>
+                <h5>${window.tripTranslations?.noTripsYet || 'No trips planned yet'}</h5>
+                <p>${window.tripTranslations?.startPlanning || 'Start planning your next adventure by creating your first trip.'}</p>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tripModal" onclick="resetTripForm()">
-                    <i class="bi bi-plus-circle me-2"></i>Plan Your First Trip
+                    <i class="bi bi-plus-circle me-2"></i>${window.tripTranslations?.planFirstTrip || 'Plan Your First Trip'}
                 </button>
             </div>
         `;
@@ -106,7 +106,7 @@ function createTripCard(trip) {
                 <div class="col-md-6">
                     <h5 class="mb-1">
                         <a href="/trips/${tripIdStr}/bookings" class="text-decoration-none text-primary fw-bold">${trip.name}</a>
-                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="viewTripBookings('${tripIdStr}')" title="View Bookings">
+                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="viewTripBookings('${tripIdStr}')" title="${window.tripTranslations?.viewBookings || 'View Bookings'}">
                             <i class="bi bi-calendar-check"></i>
                         </button>
                     </h5>
@@ -127,7 +127,7 @@ function createTripCard(trip) {
                         ${trip.traveler_count > 1 ? `
                             <div class="mb-1">
                                 <i class="bi bi-people me-1"></i>
-                                ${trip.traveler_count} travelers
+                                ${trip.traveler_count} ${window.tripTranslations?.travelers || 'travelers'}
                             </div>
                         ` : ''}
                         ${trip.description ? `
@@ -139,17 +139,17 @@ function createTripCard(trip) {
                         ${daysUntil > 0 ? `
                             <div class="mb-1">
                                 <i class="bi bi-clock me-1"></i>
-                                <span class="text-info">${daysUntil} days until departure</span>
+                                <span class="text-info">${daysUntil} ${window.tripTranslations?.daysUntilDeparture || 'days until departure'}</span>
                             </div>
                         ` : daysUntil < -duration ? `
                             <div class="mb-1">
                                 <i class="bi bi-check-circle me-1"></i>
-                                <span class="text-success">Trip completed</span>
+                                <span class="text-success">${window.tripTranslations?.tripCompleted || 'Trip completed'}</span>
                             </div>
                         ` : daysUntil <= 0 ? `
                             <div class="mb-1">
                                 <i class="bi bi-airplane me-1"></i>
-                                <span class="text-warning">Trip in progress!</span>
+                                <span class="text-warning">${window.tripTranslations?.tripInProgress || 'Trip in progress!'}</span>
                             </div>
                         ` : ''}
                     </div>
@@ -162,18 +162,18 @@ function createTripCard(trip) {
                     </div>
                     ${trip.budget ? `
                         <div class="price-display">
-                            Budget: ${TripPlanner.formatPrice(trip.budget, trip.currency)}
+                            ${window.tripTranslations?.budget || 'Budget:'} ${TripPlanner.formatPrice(trip.budget, trip.currency)}
                         </div>
                     ` : ''}
                     <div class="small text-muted mt-1">
-                        Created ${TripPlanner.formatDate(trip.created_at)}
+                        ${window.tripTranslations?.created || 'Created'} ${TripPlanner.formatDate(trip.created_at)}
                     </div>
                 </div>
                                  <div class="col-md-2 text-end">
-                     <button class="btn-action btn-edit" onclick="editTrip('${tripIdStr}')" title="Edit Trip">
+                     <button class="btn-action btn-edit" onclick="editTrip('${tripIdStr}')" title="${window.tripTranslations?.editTrip || 'Edit Trip'}">
                          <i class="bi bi-pencil"></i>
                      </button>
-                     <button class="btn-action btn-delete" onclick="deleteTrip('${tripIdStr}')" title="Delete Trip">
+                     <button class="btn-action btn-delete" onclick="deleteTrip('${tripIdStr}')" title="${window.tripTranslations?.deleteTrip || 'Delete Trip'}">
                          <i class="bi bi-trash"></i>
                      </button>
                  </div>

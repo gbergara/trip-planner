@@ -121,7 +121,7 @@
                     {% else %}
                         <div class="text-center py-4 text-muted">
                             <i class="bi bi-map fs-1 mb-3"></i>
-                            <p>No trips yet. <a href="/trips">Plan your first trip!</a></p>
+                            <p>{% if _ %}{{ _("No trips yet.") }}{% else %}No trips yet.{% endif %} <a href="/trips">{% if _ %}{{ _("Plan your first trip!") }}{% else %}Plan your first trip!{% endif %}</a></p>
                         </div>
                     {% endif %}
                 </div>

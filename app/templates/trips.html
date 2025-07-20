@@ -56,7 +56,7 @@
         <div id="trips-container">
             <div class="text-center py-4">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+                    <span class="visually-hidden">{% if _ %}{{ _('Loading...') }}{% else %}Loading...{% endif %}</span>
                 </div>
             </div>
         </div>
@@ -154,5 +154,23 @@
 {% endblock %}
 
 {% block extra_scripts %}
+<script>
+// Translation strings for JavaScript
+window.tripTranslations = {
+    noTripsYet: "{% if _ %}{{ _('No trips planned yet') }}{% else %}No trips planned yet{% endif %}",
+    startPlanning: "{% if _ %}{{ _('Start planning your next adventure by creating your first trip.') }}{% else %}Start planning your next adventure by creating your first trip.{% endif %}",
+    planFirstTrip: "{% if _ %}{{ _('Plan Your First Trip') }}{% else %}Plan Your First Trip{% endif %}",
+    loading: "{% if _ %}{{ _('Loading...') }}{% else %}Loading...{% endif %}",
+    travelers: "{% if _ %}{{ _('travelers') }}{% else %}travelers{% endif %}",
+    daysUntilDeparture: "{% if _ %}{{ _('days until departure') }}{% else %}days until departure{% endif %}",
+    tripCompleted: "{% if _ %}{{ _('Trip completed') }}{% else %}Trip completed{% endif %}",
+    tripInProgress: "{% if _ %}{{ _('Trip in progress!') }}{% else %}Trip in progress!{% endif %}",
+    budget: "{% if _ %}{{ _('Budget:') }}{% else %}Budget:{% endif %}",
+    created: "{% if _ %}{{ _('Created') }}{% else %}Created{% endif %}",
+    editTrip: "{% if _ %}{{ _('Edit Trip') }}{% else %}Edit Trip{% endif %}",
+    deleteTrip: "{% if _ %}{{ _('Delete Trip') }}{% else %}Delete Trip{% endif %}",
+    viewBookings: "{% if _ %}{{ _('View Bookings') }}{% else %}View Bookings{% endif %}"
+};
+</script>
 <script src="{{ url_for('static', path='/js/trips.js') }}"></script>
 {% endblock %} 
