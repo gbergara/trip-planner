@@ -193,31 +193,6 @@ python -m app.main
 3. Click "Continue with Google" to test OAuth
 4. After Google auth, you'll be redirected to the dashboard
 
-### **🔒 Authentication Flow**
-
-```mermaid
-graph TD
-    A[User visits /] --> B{Has session?}
-    B -->|No| C[Redirect to /login]
-    B -->|Guest session| D[Show Dashboard as Guest]
-    B -->|Auth session| E[Show Dashboard as User]
-    
-    C --> F[Login Page]
-    F --> G{User choice}
-    G -->|Start as Guest| H[Create guest session]
-    G -->|Google OAuth| I[Google Auth Flow]
-    
-    H --> J[/start-guest endpoint]
-    J --> K[Set secure cookie]
-    K --> L[Redirect to Dashboard]
-    
-    I --> M[Google OAuth consent]
-    M --> N[/auth/callback]
-    N --> O[Create/update user]
-    O --> P[Set JWT cookie]
-    P --> Q[Redirect to Dashboard]
-```
-
 ### **🛡️ Security Features**
 
 - **Guest Sessions**: Cryptographically signed cookies (30-day expiry)
