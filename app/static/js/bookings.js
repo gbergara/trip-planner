@@ -28,15 +28,15 @@ async function loadBookings() {
         currentBookings = await TripPlanner.api.get('/bookings/');
         displayBookings(currentBookings);
     } catch (error) {
-        console.error('Error loading bookings:', error);
+        console.error(window.bookingTranslations.errorLoading, error);
         container.innerHTML = `
             <div class="empty-state">
                 <i class="bi bi-exclamation-triangle"></i>
-                <p>Error loading bookings. Please try again.</p>
-                <button class="btn btn-primary" onclick="loadBookings()">Retry</button>
+                <p>${window.bookingTranslations.errorLoading}</p>
+                <button class="btn btn-primary" onclick="loadBookings()">${window.bookingTranslations.retry}</button>
             </div>
         `;
-        TripPlanner.showAlert('Failed to load bookings: ' + error.message, 'danger');
+        TripPlanner.showAlert(window.bookingTranslations.failedToLoad + ' ' + error.message, 'danger');
     }
 }
 
@@ -48,10 +48,10 @@ function displayBookings(bookings) {
         container.innerHTML = `
             <div class="empty-state">
                 <i class="bi bi-calendar-x"></i>
-                <h5>No bookings found</h5>
-                <p>Start planning your trip by creating your first booking.</p>
+                <h5>${window.bookingTranslations.noBookings}</h5>
+                <p>${window.bookingTranslations.startPlanning}</p>
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#bookingModal" onclick="resetBookingForm()">
-                    <i class="bi bi-plus-circle me-2"></i>New Booking
+                    <i class="bi bi-plus-circle me-2"></i>${window.bookingTranslations.newBooking}
                 </button>
             </div>
         `;
@@ -187,8 +187,8 @@ function clearFilters() {
 // Reset booking form
 function resetBookingForm() {
     editingBookingId = null;
-    document.getElementById('modalTitle').textContent = 'New Booking';
-    document.getElementById('submitButton').textContent = 'Save Booking';
+    document.getElementById('modalTitle').textContent = window.bookingTranslations.newBooking;
+    document.getElementById('submitButton').textContent = window.bookingTranslations.saveBooking;
     document.getElementById('bookingForm').reset();
     hideAllSpecificFields();
 }
@@ -240,10 +240,10 @@ async function handleBookingSubmit(event) {
         let result;
         if (editingBookingId) {
             result = await TripPlanner.api.put(`/bookings/${editingBookingId}`, bookingData);
-            TripPlanner.showAlert('Booking updated successfully!', 'success');
+            TripPlanner.showAlert(window.bookingTranslations.bookingUpdated, 'success');
         } else {
             result = await TripPlanner.api.post('/bookings/', bookingData);
-            TripPlanner.showAlert('Booking created successfully!', 'success');
+            TripPlanner.showAlert(window.bookingTranslations.bookingCreated, 'success');
         }
 
         // Close modal
@@ -254,8 +254,8 @@ async function handleBookingSubmit(event) {
         await loadBookings();
 
     } catch (error) {
-        console.error('Error saving booking:', error);
-        TripPlanner.showAlert('Failed to save booking: ' + error.message, 'danger');
+        console.error(window.bookingTranslations.failedToSave, error);
+        TripPlanner.showAlert(window.bookingTranslations.failedToSave + ' ' + error.message, 'danger');
     } finally {
         TripPlanner.setLoading(submitButton, false);
     }
@@ -267,8 +267,8 @@ async function editBooking(bookingId) {
         const booking = await TripPlanner.api.get(`/bookings/${bookingId}`);
         
         editingBookingId = bookingId;
-        document.getElementById('modalTitle').textContent = 'Edit Booking';
-        document.getElementById('submitButton').textContent = 'Update Booking';
+        document.getElementById('modalTitle').textContent = window.bookingTranslations.editBooking;
+        document.getElementById('submitButton').textContent = window.bookingTranslations.updateBooking;
         
         // Populate form
         populateForm(booking);
@@ -349,18 +349,18 @@ function formatDateTimeLocal(date) {
 // Delete booking
 function deleteBooking(bookingId) {
     const booking = currentBookings.find(b => b.id === bookingId);
-    const bookingTitle = booking ? booking.title : 'this booking';
-    
+    const bookingTitle = booking ? booking.title : '';
+    const confirmMsg = window.bookingTranslations.areYouSureDelete.replace('{title}', bookingTitle);
     TripPlanner.confirm(
-        `Are you sure you want to delete "${bookingTitle}"? This action cannot be undone.`,
+        confirmMsg,
         async () => {
             try {
                 await TripPlanner.api.delete(`/bookings/${bookingId}`);
-                TripPlanner.showAlert('Booking deleted successfully!', 'success');
+                TripPlanner.showAlert(window.bookingTranslations.bookingDeleted, 'success');
                 await loadBookings();
             } catch (error) {
-                console.error('Error deleting booking:', error);
-                TripPlanner.showAlert('Failed to delete booking: ' + error.message, 'danger');
+                console.error(window.bookingTranslations.failedToDelete, error);
+                TripPlanner.showAlert(window.bookingTranslations.failedToDelete + ' ' + error.message, 'danger');
             }
         }
     );

@@ -91,6 +91,17 @@ function createTripCard(trip) {
     const endDate = new Date(trip.end_date);
     const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
     const daysUntil = Math.ceil((startDate - new Date()) / (1000 * 60 * 60 * 24));
+    // Pluralize day(s) for duration
+    let durationStr = '';
+    if (window.tripTranslations) {
+        if (duration === 1) {
+            durationStr = window.tripTranslations.daySingular || 'day';
+        } else {
+            durationStr = window.tripTranslations.dayPlural || 'days';
+        }
+    } else {
+        durationStr = duration === 1 ? 'day' : 'days';
+    }
     
     // Ensure trip.id is always treated as string for large integers
     const tripIdStr = String(trip.id);
@@ -115,7 +126,7 @@ function createTripCard(trip) {
                             <i class="bi bi-calendar me-1"></i>
                             <span class="date-display">
                                 ${TripPlanner.formatDate(trip.start_date)} - ${TripPlanner.formatDate(trip.end_date)}
-                                <small class="text-muted">(${duration} days)</small>
+                                <small class="text-muted">(${duration} ${durationStr})</small>
                             </span>
                         </div>
                         ${trip.primary_destination ? `

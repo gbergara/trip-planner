@@ -50,10 +50,12 @@ const TripPlanner = {
         return icons[type] || 'info-circle';
     },
 
-    // Format date for display
+    // Format date for display, using current language
     formatDate: function(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', {
+        // Use window.currentLanguage if set, else browser language, else fallback to 'en-US'
+        const lang = window.currentLanguage || navigator.language || 'en-US';
+        return date.toLocaleDateString(lang, {
             year: 'numeric',
             month: 'long',
             day: 'numeric'

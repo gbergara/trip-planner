@@ -1,3 +1,63 @@
+# For trip duration
+msgid "day"
+msgstr "day"
+
+msgid "days"
+msgstr "days"
+# Index page info
+msgid "Trip Planner helps you organize all your travel bookings in one place."
+msgstr "Trip Planner helps you organize all your travel bookings in one place."
+
+msgid "Manage flights, accommodations, car rentals, and activities with ease."
+msgstr "Manage flights, accommodations, car rentals, and activities with ease."
+
+msgid "All your data is stored securely."
+msgstr "All your data is stored securely."
+# Bookings page JS/i18n
+msgid "errorLoading"
+msgstr "Error loading bookings."
+
+msgid "retry"
+msgstr "Retry"
+
+msgid "failedToLoad"
+msgstr "Failed to load bookings."
+
+msgid "noBookings"
+msgstr "No bookings yet"
+
+msgid "startPlanning"
+msgstr "Start by adding your first booking."
+
+msgid "newBooking"
+msgstr "New Booking"
+
+msgid "saveBooking"
+msgstr "Save Booking"
+
+msgid "editBooking"
+msgstr "Edit Booking"
+
+msgid "updateBooking"
+msgstr "Update Booking"
+
+msgid "failedToSave"
+msgstr "Failed to save booking."
+
+msgid "bookingUpdated"
+msgstr "Booking updated successfully!"
+
+msgid "bookingCreated"
+msgstr "Booking created successfully!"
+
+msgid "areYouSureDelete"
+msgstr "Are you sure you want to delete '{title}'? This action cannot be undone."
+
+msgid "bookingDeleted"
+msgstr "Booking deleted successfully!"
+
+msgid "failedToDelete"
+msgstr "Failed to delete booking."
 # English translations for Trip Planner
 # Copyright (C) 2024
 # This file is distributed under the same license as the Trip Planner package.

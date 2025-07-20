@@ -654,4 +654,30 @@ async function handleFormSubmit(e) {
     }
 }
 </script>
-{% endblock %} 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Translation strings for JavaScript
+window.bookingTranslations = {
+    noBookings: "{% if _ %}{{ _('No bookings found') }}{% else %}No bookings found{% endif %}",
+    startPlanning: "{% if _ %}{{ _('Start planning your trip by creating your first booking.') }}{% else %}Start planning your trip by creating your first booking.{% endif %}",
+    newBooking: "{% if _ %}{{ _('New Booking') }}{% else %}New Booking{% endif %}",
+    addBooking: "{% if _ %}{{ _('Add Booking') }}{% else %}Add Booking{% endif %}",
+    editBooking: "{% if _ %}{{ _('Edit Booking') }}{% else %}Edit Booking{% endif %}",
+    updateBooking: "{% if _ %}{{ _('Update Booking') }}{% else %}Update Booking{% endif %}",
+    saveBooking: "{% if _ %}{{ _('Save Booking') }}{% else %}Save Booking{% endif %}",
+    bookingCreated: "{% if _ %}{{ _('Booking created successfully!') }}{% else %}Booking created successfully!{% endif %}",
+    bookingUpdated: "{% if _ %}{{ _('Booking updated successfully!') }}{% else %}Booking updated successfully!{% endif %}",
+    bookingDeleted: "{% if _ %}{{ _('Booking deleted successfully!') }}{% else %}Booking deleted successfully!{% endif %}",
+    failedToLoad: "{% if _ %}{{ _('Failed to load bookings:') }}{% else %}Failed to load bookings:{% endif %}",
+    failedToSave: "{% if _ %}{{ _('Failed to save booking:') }}{% else %}Failed to save booking:{% endif %}",
+    failedToDelete: "{% if _ %}{{ _('Failed to delete booking:') }}{% else %}Failed to delete booking:{% endif %}",
+    errorLoading: "{% if _ %}{{ _('Error loading bookings. Please try again.') }}{% else %}Error loading bookings. Please try again.{% endif %}",
+    retry: "{% if _ %}{{ _('Retry') }}{% else %}Retry{% endif %}",
+    loading: "{% if _ %}{{ _('Loading...') }}{% else %}Loading...{% endif %}",
+    areYouSureDelete: "{% if _ %}{{ _('Are you sure you want to delete "{title}"? This action cannot be undone.') }}{% else %}Are you sure you want to delete \"{title}\"? This action cannot be undone.{% endif %}",
+    cancel: "{% if _ %}{{ _('Cancel') }}{% else %}Cancel{% endif %}"
+};
+</script>
+{% endblock %}
