@@ -402,6 +402,17 @@ function showCreateBookingModal() {
     document.getElementById('status').value = 'pending';
     document.getElementById('currency').value = '{{ trip.currency }}';
     
+    // Set default dates to trip dates
+    const tripStartDate = new Date('{{ trip.start_date.isoformat() }}');
+    const tripEndDate = new Date('{{ trip.end_date.isoformat() }}');
+    
+    // Format for datetime-local input (YYYY-MM-DDTHH:mm)
+    const startDateTime = new Date(tripStartDate.getTime() - tripStartDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    const endDateTime = new Date(tripEndDate.getTime() - tripEndDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    
+    document.getElementById('start_date').value = startDateTime;
+    document.getElementById('end_date').value = endDateTime;
+    
     const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
     modal.show();
 }
@@ -603,6 +614,12 @@ function showCreateTodoModal() {
     document.getElementById('todoModalTitle').textContent = '{% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}';
     document.getElementById('todoSubmitButton').textContent = '{% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}';
     document.getElementById('todoForm').reset();
+    
+    // Set default due date to current date/time
+    const currentDate = new Date();
+    const currentDateTime = new Date(currentDate.getTime() - currentDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+    document.getElementById('todoDueDate').value = currentDateTime;
+    
     const modal = new bootstrap.Modal(document.getElementById('todoModal'));
     modal.show();
 }
