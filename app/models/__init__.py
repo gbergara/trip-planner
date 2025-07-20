@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
-from .booking import BookingType, BookingStatus, TripStatus
+from .booking import BookingType, BookingStatus, TripStatus, TodoCategory
 
 # User schemas
 class UserBase(BaseModel):
@@ -155,6 +155,36 @@ class BookingUpdate(BaseModel):
 class BookingResponse(BookingBase):
     id: UUID
     booking_date: datetime
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+# Todo schemas
+class TodoBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    category: TodoCategory = TodoCategory.OTHER
+    priority: int = 2  # 1=high, 2=medium, 3=low
+    due_date: Optional[datetime] = None
+
+class TodoCreate(TodoBase):
+    trip_id: UUID
+
+class TodoUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    category: Optional[TodoCategory] = None
+    priority: Optional[int] = None
+    due_date: Optional[datetime] = None
+    completed: Optional[bool] = None
+
+class TodoResponse(TodoBase):
+    id: UUID
+    trip_id: UUID
+    completed: bool
+    completed_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
 

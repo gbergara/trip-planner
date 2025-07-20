@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Float, Enum, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Float, Enum, Text, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -51,6 +51,7 @@ class Trip(Base):
     # Relationships
     user = relationship("User", back_populates="trips")  # Will be None for guest users
     bookings = relationship("Booking", back_populates="trip", cascade="all, delete-orphan")
+    todos = relationship("Todo", back_populates="trip", cascade="all, delete-orphan")
 
 class BookingType(enum.Enum):
     FLIGHT = "flight"
@@ -124,3 +125,38 @@ class Booking(Base):
     
     # Relationships
     trip = relationship("Trip", back_populates="bookings")
+
+class TodoCategory(enum.Enum):
+    FLIGHT = "flight"
+    ACCOMMODATION = "accommodation"  
+    TRANSPORT = "transport"
+    ACTIVITY = "activity"
+    DOCUMENTS = "documents"
+    PACKING = "packing"
+    OTHER = "other"
+
+class Todo(Base):
+    __tablename__ = "todos"
+    
+    id = Column(get_uuid_type(), primary_key=True, default=uuid.uuid4, index=True)
+    trip_id = Column(get_uuid_type(), ForeignKey("trips.id"), nullable=False)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=True)
+    category = Column(Enum(TodoCategory), default=TodoCategory.OTHER)
+    
+    # Status
+    completed = Column(Boolean, default=False)
+    completed_at = Column(DateTime, nullable=True)
+    
+    # Priority (1 = high, 2 = medium, 3 = low)
+    priority = Column(Integer, default=2)
+    
+    # Due date (optional)
+    due_date = Column(DateTime, nullable=True)
+    
+    # Timestamps
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Relationships  
+    trip = relationship("Trip", back_populates="todos")

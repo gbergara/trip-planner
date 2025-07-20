@@ -82,7 +82,7 @@
                         </div>
                         <div class="col-md-4">
                             <label for="booking_type" class="form-label">{% if _ %}{{ _("Type") }}{% else %}Type{% endif %} *</label>
-                            <select class="form-select" id="booking_type" name="booking_type" required onchange="updateLocationLabels()">
+                            <select class="form-select" id="booking_type" name="booking_type" required onchange="toggleSpecificFields(); updateLocationLabels();">
                                 <option value="">Select Type</option>
                                 <option value="flight">{% if _ %}{{ _("Flight") }}{% else %}Flight{% endif %}</option>
                                 <option value="accommodation">{% if _ %}{{ _("Accommodation") }}{% else %}Accommodation{% endif %}</option>
@@ -143,6 +143,67 @@
                                 <option value="JPY">JPY</option>
                             </select>
                         </div>
+                        <!-- Type-specific fields -->
+                        <!-- Flight specific fields -->
+                        <div id="flight-fields" style="display: none;">
+                            <div class="col-md-6">
+                                <label for="flight_number" class="form-label">{% if _ %}{{ _("Flight Number") }}{% else %}Flight Number{% endif %}</label>
+                                <input type="text" class="form-control" id="flight_number" name="flight_number">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="airline" class="form-label">{% if _ %}{{ _("Airline") }}{% else %}Airline{% endif %}</label>
+                                <input type="text" class="form-control" id="airline" name="airline">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="departure_terminal" class="form-label">{% if _ %}{{ _("Departure Terminal") }}{% else %}Departure Terminal{% endif %}</label>
+                                <input type="text" class="form-control" id="departure_terminal" name="departure_terminal">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="arrival_terminal" class="form-label">{% if _ %}{{ _("Arrival Terminal") }}{% else %}Arrival Terminal{% endif %}</label>
+                                <input type="text" class="form-control" id="arrival_terminal" name="arrival_terminal">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="seat_number" class="form-label">{% if _ %}{{ _("Seat Number") }}{% else %}Seat Number{% endif %}</label>
+                                <input type="text" class="form-control" id="seat_number" name="seat_number">
+                            </div>
+                        </div>
+
+                        <!-- Accommodation specific fields -->
+                        <div id="accommodation-fields" style="display: none;">
+                            <div class="col-md-6">
+                                <label for="room_type" class="form-label">{% if _ %}{{ _("Room Type") }}{% else %}Room Type{% endif %}</label>
+                                <input type="text" class="form-control" id="room_type" name="room_type">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="guests_count" class="form-label">{% if _ %}{{ _("Number of Guests") }}{% else %}Number of Guests{% endif %}</label>
+                                <input type="number" class="form-control" id="guests_count" name="guests_count" min="1">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="check_in_time" class="form-label">{% if _ %}{{ _("Check-in Time") }}{% else %}Check-in Time{% endif %}</label>
+                                <input type="text" class="form-control" id="check_in_time" name="check_in_time" placeholder="{% if _ %}{{ _('e.g., 15:00') }}{% else %}e.g., 15:00{% endif %}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="check_out_time" class="form-label">{% if _ %}{{ _("Check-out Time") }}{% else %}Check-out Time{% endif %}</label>
+                                <input type="text" class="form-control" id="check_out_time" name="check_out_time" placeholder="{% if _ %}{{ _('e.g., 11:00') }}{% else %}e.g., 11:00{% endif %}">
+                            </div>
+                        </div>
+
+                        <!-- Car rental specific fields -->
+                        <div id="car-rental-fields" style="display: none;">
+                            <div class="col-md-12">
+                                <label for="car_model" class="form-label">{% if _ %}{{ _("Car Model") }}{% else %}Car Model{% endif %}</label>
+                                <input type="text" class="form-control" id="car_model" name="car_model">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="pickup_location" class="form-label">{% if _ %}{{ _("Pickup Location") }}{% else %}Pickup Location{% endif %}</label>
+                                <input type="text" class="form-control" id="pickup_location" name="pickup_location">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="return_location" class="form-label">{% if _ %}{{ _("Return Location") }}{% else %}Return Location{% endif %}</label>
+                                <input type="text" class="form-control" id="return_location" name="return_location">
+                            </div>
+                        </div>
+
                         <div class="col-12">
                             <label for="notes" class="form-label">{% if _ %}{{ _("Notes") }}{% else %}Notes{% endif %}</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>

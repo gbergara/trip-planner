@@ -445,4 +445,96 @@ msgid "Created"
 msgstr "Created"
 
 msgid "View Bookings"
-msgstr "View Bookings" 
+msgstr "View Bookings"
+
+# Flight specific fields
+msgid "Flight Number"
+msgstr "Flight Number"
+
+msgid "Airline"
+msgstr "Airline"
+
+msgid "Departure Terminal"
+msgstr "Departure Terminal"
+
+msgid "Arrival Terminal"
+msgstr "Arrival Terminal"
+
+msgid "Seat Number"
+msgstr "Seat Number"
+
+# Accommodation fields
+msgid "Room Type"
+msgstr "Room Type"
+
+msgid "Number of Guests"
+msgstr "Number of Guests"
+
+msgid "Check-in Time"
+msgstr "Check-in Time"
+
+msgid "Check-out Time"
+msgstr "Check-out Time"
+
+msgid "e.g., 15:00"
+msgstr "e.g., 15:00"
+
+msgid "e.g., 11:00"
+msgstr "e.g., 11:00"
+
+# Car rental fields
+msgid "Car Model"
+msgstr "Car Model"
+
+msgid "Pickup Location"
+msgstr "Pickup Location"
+
+msgid "Return Location"
+msgstr "Return Location"
+
+# TODO List
+msgid "TODO List"
+msgstr "TODO List"
+
+msgid "Add Todo"
+msgstr "Add Todo"
+
+msgid "Todo Title"
+msgstr "Todo Title"
+
+msgid "Todo Description"
+msgstr "Todo Description"
+
+msgid "Category"
+msgstr "Category"
+
+msgid "Priority"
+msgstr "Priority"
+
+msgid "High"
+msgstr "High"
+
+msgid "Medium"
+msgstr "Medium"
+
+msgid "Low"
+msgstr "Low"
+
+msgid "Due Date"
+msgstr "Due Date"
+
+msgid "Mark as Complete"
+msgstr "Mark as Complete"
+
+msgid "Mark as Pending"
+msgstr "Mark as Pending"
+
+# TODO Categories (Transport, Documents, Packing are new)
+msgid "Transport"
+msgstr "Transport"
+
+msgid "Documents"
+msgstr "Documents"
+
+msgid "Packing"
+msgstr "Packing" 

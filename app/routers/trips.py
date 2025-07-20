@@ -9,11 +9,12 @@ from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from uuid import UUID
+from datetime import datetime
 
 from ..core.database import get_db
-from ..models.booking import Trip, Booking
+from ..models.booking import Trip, Booking, Todo, TodoCategory
 from ..models.user import User
-from ..models import TripCreate, TripUpdate, TripResponse, BookingResponse
+from ..models import TripCreate, TripUpdate, TripResponse, BookingResponse, TodoCreate, TodoUpdate, TodoResponse
 from .auth import get_current_user_optional
 from ..services.session_service import session_service
 
@@ -270,4 +271,143 @@ def update_trip_status(
     
     db.commit()
     db.refresh(db_trip)
-    return db_trip 
+    return db_trip
+
+# TODO Endpoints
+
+@router.get("/{trip_id}/todos", response_model=List[TodoResponse])
+def get_trip_todos(
+    trip_id: UUID,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """Get all todos for a specific trip."""
+    # Find the trip and verify access
+    query = db.query(Trip)
+    if current_user:
+        query = query.filter(Trip.user_id == current_user.id)
+    else:
+        # Guest user - verify by session
+        guest_session_id = session_service.get_or_create_guest_session(request, response)
+        query = query.filter(Trip.guest_session_id == guest_session_id)
+    
+    db_trip = query.filter(Trip.id == trip_id).first()
+    if db_trip is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    
+    # Get todos for this trip
+    todos = db.query(Todo).filter(Todo.trip_id == trip_id).order_by(Todo.priority, Todo.created_at).all()
+    return todos
+
+@router.post("/{trip_id}/todos", response_model=TodoResponse, status_code=status.HTTP_201_CREATED)
+def create_todo(
+    trip_id: UUID,
+    todo: TodoCreate,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """Create a new todo for a trip."""
+    # Find the trip and verify access
+    query = db.query(Trip)
+    if current_user:
+        query = query.filter(Trip.user_id == current_user.id)
+    else:
+        # Guest user - verify by session
+        guest_session_id = session_service.get_or_create_guest_session(request, response)
+        query = query.filter(Trip.guest_session_id == guest_session_id)
+    
+    db_trip = query.filter(Trip.id == trip_id).first()
+    if db_trip is None:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    
+    # Create the todo
+    db_todo = Todo(
+        trip_id=trip_id,
+        title=todo.title,
+        description=todo.description,
+        category=todo.category,
+        priority=todo.priority,
+        due_date=todo.due_date
+    )
+    db.add(db_todo)
+    db.commit()
+    db.refresh(db_todo)
+    return db_todo
+
+@router.put("/todos/{todo_id}", response_model=TodoResponse)
+def update_todo(
+    todo_id: UUID,
+    todo_update: TodoUpdate,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """Update a todo."""
+    # Find the todo and verify access through the trip
+    db_todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if db_todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    
+    # Verify access to the trip
+    query = db.query(Trip).filter(Trip.id == db_todo.trip_id)
+    if current_user:
+        query = query.filter(Trip.user_id == current_user.id)
+    else:
+        # Guest user - verify by session
+        guest_session_id = session_service.get_or_create_guest_session(request, response)
+        query = query.filter(Trip.guest_session_id == guest_session_id)
+    
+    db_trip = query.first()
+    if db_trip is None:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Update the todo
+    update_data = todo_update.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(db_todo, field, value)
+    
+    # If marking as completed, set completed_at
+    if todo_update.completed is True and not db_todo.completed_at:
+        db_todo.completed_at = datetime.utcnow()
+    elif todo_update.completed is False:
+        db_todo.completed_at = None
+    
+    db.commit()
+    db.refresh(db_todo)
+    return db_todo
+
+@router.delete("/todos/{todo_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_todo(
+    todo_id: UUID,
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """Delete a todo."""
+    # Find the todo and verify access through the trip
+    db_todo = db.query(Todo).filter(Todo.id == todo_id).first()
+    if db_todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    
+    # Verify access to the trip
+    query = db.query(Trip).filter(Trip.id == db_todo.trip_id)
+    if current_user:
+        query = query.filter(Trip.user_id == current_user.id)
+    else:
+        # Guest user - verify by session
+        guest_session_id = session_service.get_or_create_guest_session(request, response)
+        query = query.filter(Trip.guest_session_id == guest_session_id)
+    
+    db_trip = query.first()
+    if db_trip is None:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Delete the todo
+    db.delete(db_todo)
+    db.commit() 

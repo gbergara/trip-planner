@@ -511,4 +511,96 @@ msgid "Created"
 msgstr "Creado"
 
 msgid "View Bookings"
-msgstr "Ver Reservas" 
+msgstr "Ver Reservas"
+
+# Flight specific fields
+msgid "Flight Number"
+msgstr "Número de Vuelo"
+
+msgid "Airline"
+msgstr "Aerolínea"
+
+msgid "Departure Terminal"
+msgstr "Terminal de Salida"
+
+msgid "Arrival Terminal"
+msgstr "Terminal de Llegada"
+
+msgid "Seat Number"
+msgstr "Número de Asiento"
+
+# Accommodation fields
+msgid "Room Type"
+msgstr "Tipo de Habitación"
+
+msgid "Number of Guests"
+msgstr "Número de Huéspedes"
+
+msgid "Check-in Time"
+msgstr "Hora de Check-in"
+
+msgid "Check-out Time"
+msgstr "Hora de Check-out"
+
+msgid "e.g., 15:00"
+msgstr "ej., 15:00"
+
+msgid "e.g., 11:00"
+msgstr "ej., 11:00"
+
+# Car rental fields
+msgid "Car Model"
+msgstr "Modelo de Coche"
+
+msgid "Pickup Location"
+msgstr "Lugar de Recogida"
+
+msgid "Return Location"
+msgstr "Lugar de Devolución"
+
+# TODO List
+msgid "TODO List"
+msgstr "Lista de Tareas"
+
+msgid "Add Todo"
+msgstr "Agregar Tarea"
+
+msgid "Todo Title"
+msgstr "Título de la Tarea"
+
+msgid "Todo Description"
+msgstr "Descripción de la Tarea"
+
+msgid "Category"
+msgstr "Categoría"
+
+msgid "Priority"
+msgstr "Prioridad"
+
+msgid "High"
+msgstr "Alta"
+
+msgid "Medium"
+msgstr "Media"
+
+msgid "Low"
+msgstr "Baja"
+
+msgid "Due Date"
+msgstr "Fecha Límite"
+
+msgid "Mark as Complete"
+msgstr "Marcar como Completado"
+
+msgid "Mark as Pending"
+msgstr "Marcar como Pendiente"
+
+# TODO Categories (Transport, Documents, Packing are new)
+msgid "Transport"
+msgstr "Transporte"
+
+msgid "Documents"
+msgstr "Documentos"
+
+msgid "Packing"
+msgstr "Equipaje" 

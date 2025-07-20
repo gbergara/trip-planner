@@ -104,12 +104,31 @@
         </div>
     </div>
 
-    <!-- Bookings List -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
+    <!-- TODO List -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">{% if _ %}{{ _("TODO List") }}{% else %}TODO List{% endif %}</h5>
+                    <button class="btn btn-sm btn-primary" onclick="showCreateTodoModal()">
+                        <i class="bi bi-plus"></i> {% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div id="todosContainer">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">{% if _ %}{{ _("Loading...") }}{% else %}Loading...{% endif %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card h-100">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Bookings</h5>
+                    <h5 class="card-title mb-0">{% if _ %}{{ _("Bookings") }}{% else %}Bookings{% endif %}</h5>
                 </div>
                 <div class="card-body">
                     <div id="bookingsContainer">
@@ -512,5 +531,219 @@ function exportTripToPDF() {
     // Show success message
     TripPlanner.showAlert('{% if _ %}{{ _("PDF exported successfully!") }}{% else %}PDF exported successfully!{% endif %}', 'success');
 }
+
+// TODO Management Functions
+let editingTodoId = null;
+
+async function loadTodos() {
+    console.log('loadTodos() called - starting API request...');
+    try {
+        console.log('Making API request to:', `/trips/${tripId}/todos`);
+        const todos = await TripPlanner.api.get(`/trips/${tripId}/todos`);
+        console.log('API request successful, todos received:', todos);
+        displayTodos(todos);
+    } catch (error) {
+        console.error('Error loading todos:', error);
+        console.log('Replacing spinner with error message...');
+        document.getElementById('todosContainer').innerHTML = `
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">{% if _ %}{{ _("Failed to load todos") }}{% else %}Failed to load todos{% endif %}</p>
+                <p class="text-muted small">Error: ${error.message || error}</p>
+            </div>
+        `;
+    }
+}
+
+function displayTodos(todos) {
+    const container = document.getElementById('todosContainer');
+    
+    if (todos.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-3">
+                <p class="text-muted mb-0">{% if _ %}{{ _("No todos yet") }}{% else %}No todos yet{% endif %}</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const todoHtml = todos.map(todo => {
+        const priorityClass = todo.priority === 1 ? 'danger' : (todo.priority === 2 ? 'warning' : 'secondary');
+        const dueDate = todo.due_date ? new Date(todo.due_date).toLocaleDateString() : '';
+        
+        return `
+            <div class="list-group-item d-flex justify-content-between align-items-start ${todo.completed ? 'opacity-50' : ''}">
+                <div class="form-check me-2">
+                    <input class="form-check-input" type="checkbox" ${todo.completed ? 'checked' : ''} onchange="toggleTodo('${todo.id}', this.checked)">
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1 ${todo.completed ? 'text-decoration-line-through' : ''}">${todo.title}</h6>
+                    ${todo.description ? `<p class="mb-1 text-muted small">${todo.description}</p>` : ''}
+                    <div class="d-flex gap-2">
+                        <span class="badge bg-${priorityClass}">${todo.category}</span>
+                        ${dueDate ? `<small class="text-muted">Due: ${dueDate}</small>` : ''}
+                    </div>
+                </div>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary btn-sm" onclick="editTodo('${todo.id}')" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="deleteTodo('${todo.id}')" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = `<div class="list-group list-group-flush">${todoHtml}</div>`;
+}
+
+function showCreateTodoModal() {
+    editingTodoId = null;
+    document.getElementById('todoModalTitle').textContent = '{% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}';
+    document.getElementById('todoSubmitButton').textContent = '{% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}';
+    document.getElementById('todoForm').reset();
+    const modal = new bootstrap.Modal(document.getElementById('todoModal'));
+    modal.show();
+}
+
+async function editTodo(todoId) {
+    try {
+        // Find todo in current data (you might want to fetch fresh data)
+        editingTodoId = todoId;
+        document.getElementById('todoModalTitle').textContent = '{% if _ %}{{ _("Edit Todo") }}{% else %}Edit Todo{% endif %}';
+        document.getElementById('todoSubmitButton').textContent = '{% if _ %}{{ _("Update Todo") }}{% else %}Update Todo{% endif %}';
+        
+        // You'd populate the form with existing data here
+        const modal = new bootstrap.Modal(document.getElementById('todoModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Error editing todo:', error);
+        TripPlanner.showAlert('{% if _ %}{{ _("Failed to load todo") }}{% else %}Failed to load todo{% endif %}', 'danger');
+    }
+}
+
+async function toggleTodo(todoId, completed) {
+    try {
+        await TripPlanner.api.put(`/trips/todos/${todoId}`, { completed });
+        await loadTodos();
+    } catch (error) {
+        console.error('Error toggling todo:', error);
+        TripPlanner.showAlert('{% if _ %}{{ _("Failed to update todo") }}{% else %}Failed to update todo{% endif %}', 'danger');
+    }
+}
+
+async function deleteTodo(todoId) {
+    if (!confirm('{% if _ %}{{ _("Are you sure you want to delete this todo?") }}{% else %}Are you sure you want to delete this todo?{% endif %}')) return;
+    
+    try {
+        await TripPlanner.api.delete(`/trips/todos/${todoId}`);
+        await loadTodos();
+        TripPlanner.showAlert('{% if _ %}{{ _("Todo deleted successfully!") }}{% else %}Todo deleted successfully!{% endif %}', 'success');
+    } catch (error) {
+        console.error('Error deleting todo:', error);
+        TripPlanner.showAlert('{% if _ %}{{ _("Failed to delete todo") }}{% else %}Failed to delete todo{% endif %}', 'danger');
+    }
+}
+
+// Handle todo form submission
+function handleTodoFormSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const todoData = {
+        trip_id: tripId,
+        title: formData.get('title'),
+        description: formData.get('description'),
+        category: formData.get('category'),
+        priority: parseInt(formData.get('priority')),
+        due_date: formData.get('due_date') || null
+    };
+    
+    (async function() {
+        try {
+            if (editingTodoId) {
+                            await TripPlanner.api.put(`/trips/todos/${editingTodoId}`, todoData);
+            TripPlanner.showAlert('{% if _ %}{{ _("Todo updated successfully!") }}{% else %}Todo updated successfully!{% endif %}', 'success');
+        } else {
+            await TripPlanner.api.post(`/trips/${tripId}/todos`, todoData);
+                TripPlanner.showAlert('{% if _ %}{{ _("Todo created successfully!") }}{% else %}Todo created successfully!{% endif %}', 'success');
+            }
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('todoModal'));
+            modal.hide();
+            await loadTodos();
+        } catch (error) {
+            console.error('Error saving todo:', error);
+            TripPlanner.showAlert('{% if _ %}{{ _("Failed to save todo") }}{% else %}Failed to save todo{% endif %}', 'danger');
+        }
+    })();
+}
+
+// Initialize todos when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadTodos();
+    
+    // Setup todo form event listener
+    const todoForm = document.getElementById('todoForm');
+    if (todoForm) {
+        todoForm.addEventListener('submit', handleTodoFormSubmit);
+    }
+});
 </script>
+
+<!-- TODO Modal -->
+<div class="modal fade" id="todoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="todoModalTitle">{% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="todoForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="todoTitle" class="form-label">{% if _ %}{{ _("Todo Title") }}{% else %}Title{% endif %} *</label>
+                        <input type="text" class="form-control" id="todoTitle" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="todoDescription" class="form-label">{% if _ %}{{ _("Todo Description") }}{% else %}Description{% endif %}</label>
+                        <textarea class="form-control" id="todoDescription" name="description" rows="2"></textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="todoCategory" class="form-label">{% if _ %}{{ _("Category") }}{% else %}Category{% endif %}</label>
+                            <select class="form-select" id="todoCategory" name="category">
+                                <option value="flight">{% if _ %}{{ _("Flight") }}{% else %}Flight{% endif %}</option>
+                                <option value="accommodation">{% if _ %}{{ _("Accommodation") }}{% else %}Accommodation{% endif %}</option>
+                                <option value="transport">{% if _ %}{{ _("Transport") }}{% else %}Transport{% endif %}</option>
+                                <option value="activity">{% if _ %}{{ _("Activity") }}{% else %}Activity{% endif %}</option>
+                                <option value="documents">{% if _ %}{{ _("Documents") }}{% else %}Documents{% endif %}</option>
+                                <option value="packing">{% if _ %}{{ _("Packing") }}{% else %}Packing{% endif %}</option>
+                                <option value="other">{% if _ %}{{ _("Other") }}{% else %}Other{% endif %}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="todoPriority" class="form-label">{% if _ %}{{ _("Priority") }}{% else %}Priority{% endif %}</label>
+                            <select class="form-select" id="todoPriority" name="priority">
+                                <option value="1">{% if _ %}{{ _("High") }}{% else %}High{% endif %}</option>
+                                <option value="2" selected>{% if _ %}{{ _("Medium") }}{% else %}Medium{% endif %}</option>
+                                <option value="3">{% if _ %}{{ _("Low") }}{% else %}Low{% endif %}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="todoDueDate" class="form-label">{% if _ %}{{ _("Due Date") }}{% else %}Due Date{% endif %}</label>
+                        <input type="datetime-local" class="form-control" id="todoDueDate" name="due_date">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% if _ %}{{ _("Cancel") }}{% else %}Cancel{% endif %}</button>
+                    <button type="submit" class="btn btn-primary" id="todoSubmitButton">{% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %} 
