@@ -8,10 +8,12 @@ services:
       - "8000:8000"
     # volumes:
     #   - ./app:/app/app    # Mount source for development (optional)
+    env_file:
+      - .env
     environment:
-      - ENVIRONMENT=production
-      - DATABASE_URL=cockroachdb://root@cockroachdb:26257/trip_planner?sslmode=disable
-      - DB_DEBUG=false
+      - ENVIRONMENT=${ENVIRONMENT}
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_DEBUG=${DB_DEBUG}
     depends_on:
       alembic-migrate:
         condition: service_completed_successfully
@@ -22,6 +24,8 @@ services:
   trip-planner-test:
     build: .
     container_name: trip-planner-test
+    env_file:
+      - .env
     environment:
       - TESTING=true
       - DATABASE_URL=postgresql://test_user:test_pass@postgres-test:5432/trip_planner_test

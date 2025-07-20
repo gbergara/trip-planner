@@ -20,6 +20,7 @@ def get_db_type():
         return "sqlite"
     return "unknown"
 from .core.config import APP_NAME, APP_VERSION, APP_DESCRIPTION, TEMPLATES_DIR, STATIC_DIR
+from starlette.middleware.sessions import SessionMiddleware
 from .models.booking import Trip, Booking
 from .models.user import User
 from .routers import bookings, trips, auth
@@ -55,6 +56,12 @@ app = FastAPI(
             "description": "**User Authentication** - Google OAuth2 integration with guest session support. Manage user accounts and session tokens.",
         },
     ],
+)
+
+# Add session middleware after app is created
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SECRET_KEY"),
 )
 
 # Database tables are now managed by Alembic migrations

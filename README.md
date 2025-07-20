@@ -210,55 +210,17 @@ python -m app.main
 - ⚠️ No cross-device sync
 - ⚠️ No permanent storage
 
-### **🎭 Google OAuth Setup (Optional)**
 
-**Enable Google authentication for permanent storage and sync:**
+### **Google Authentication**
 
-#### **1. Create Google OAuth Credentials**
+To enable Google authentication, provide the following environment variables in your `.env` file:
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Enable the **Google+ API** and **Google Identity API**
-4. Go to **Credentials** → **Create Credentials** → **OAuth 2.0 Client IDs**
-5. Set authorized redirect URIs:
-   ```
-   http://localhost:8000/auth/callback          # For development
-   https://yourdomain.com/auth/callback         # For production
-   ```
-
-#### **2. Configure Environment Variables**
-
-Create a `.env` file or set environment variables:
-
-```bash
-# Required for Google OAuth
-GOOGLE_CLIENT_ID=your_google_client_id_from_step_1
-GOOGLE_CLIENT_SECRET=your_google_client_secret_from_step_1
-SECRET_KEY=your_random_secret_key_for_jwt_signing
-
-# Generate a secure secret key:
-# python -c "import secrets; print(secrets.token_urlsafe(32))"
+```env
+# Google Authentication
+GOOGLE_CLIENT_ID=<yourID>.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=<your secret>
+GOOGLE_AUTH_REDIRECT_URI="http://localhost:8000/auth/callback"
 ```
-
-#### **3. Start with OAuth Enabled**
-
-```bash
-# With Docker
-docker-compose up -d
-
-# Or locally with environment variables
-export GOOGLE_CLIENT_ID="your_client_id"
-export GOOGLE_CLIENT_SECRET="your_client_secret" 
-export SECRET_KEY="your_secret_key"
-python -m app.main
-```
-
-#### **4. Test OAuth Flow**
-
-1. Navigate to http://localhost:8000
-2. You'll see **both options**: "Continue with Google" and "Continue as Guest"
-3. Click "Continue with Google" to test OAuth
-4. After Google auth, you'll be redirected to the dashboard
 
 ### **🛡️ Security Features**
 

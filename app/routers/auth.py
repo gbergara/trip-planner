@@ -98,7 +98,7 @@ async def auth_login(request: Request):
     redirect_uri = str(request.base_url) + "auth/callback"
     
     # Get authorization URL and redirect
-    return auth_service.get_authorization_url(request, redirect_uri)
+    return await auth_service.get_authorization_url(request, redirect_uri)
 
 
 @router.get("/callback")
