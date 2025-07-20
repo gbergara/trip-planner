@@ -190,9 +190,85 @@
                 font-size: 1.5rem;
             }
         }
+        
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .language-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 8px 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .language-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .language-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 8px 0;
+            min-width: 140px;
+            display: none;
+            z-index: 1001;
+        }
+        
+        .language-dropdown.show {
+            display: block;
+        }
+        
+        .language-dropdown a {
+            display: block;
+            padding: 8px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        
+        .language-dropdown a:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
     </style>
 </head>
 <body>
+    <!-- Language Switcher -->
+    <div class="language-switcher">
+        <div class="dropdown">
+            <button class="language-btn" onclick="toggleLanguageDropdown()">
+                <i class="bi bi-globe"></i>
+                <span id="current-lang">{% if language == 'es' %}Español{% else %}English{% endif %}</span>
+                <i class="bi bi-chevron-down"></i>
+            </button>
+            <div class="language-dropdown" id="languageDropdown">
+                <a href="#" onclick="switchLanguage('en')">🇬🇧 English</a>
+                <a href="#" onclick="switchLanguage('es')">🇪🇸 Español</a>
+            </div>
+        </div>
+    </div>
+    
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-12">
@@ -299,10 +375,48 @@
         }
         
         // Add loading state to Google login button
-        document.querySelector('.google-login-btn').addEventListener('click', function() {
+        document.querySelector('.google-login-btn')?.addEventListener('click', function() {
             this.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div>{% if _ %}{{ _("Signing in...") }}{% else %}Signing in...{% endif %}';
             this.style.pointerEvents = 'none';
         });
+
+        // Language switcher functions
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('languageDropdown');
+            const button = document.querySelector('.language-btn');
+            
+            if (!button.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Language switching function
+        async function switchLanguage(lang) {
+            try {
+                const response = await fetch('/set-language', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({"language": lang})
+                });
+                
+                if (response.ok) {
+                    // Reload the page to apply the new language
+                    window.location.reload();
+                } else {
+                    console.error('Failed to switch language');
+                }
+            } catch (error) {
+                console.error('Error switching language:', error);
+            }
+        }
     </script>
 </body>
 </html> 

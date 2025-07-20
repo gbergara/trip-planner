@@ -53,16 +53,23 @@
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-globe me-1"></i>{% if _ %}{{ _("Language") }}{% else %}Language{% endif %}
+                            <i class="bi bi-globe me-1"></i>
+                            {% if language == 'es' %}
+                                🇪🇸 Español
+                            {% else %}
+                                🇬🇧 English
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu">
                             {% if languages %}
                                 {% for lang_code, lang_name in languages.items() %}
-                                <li><a class="dropdown-item" href="#" onclick="switchLanguage('{{ lang_code }}')">{{ lang_name }}</a></li>
+                                                                 <li><a class="dropdown-item" href="#" onclick="switchLanguage('{{ lang_code }}')">
+                                     {% if lang_code == 'es' %}🇪🇸{% else %}🇬🇧{% endif %} {{ lang_name }}
+                                 </a></li>
                                 {% endfor %}
                             {% else %}
-                                <li><a class="dropdown-item" href="#" onclick="switchLanguage('en')">English</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="switchLanguage('es')">Español</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="switchLanguage('en')">🇬🇧 English</a></li>
+                                <li><a class="dropdown-item" href="#" onclick="switchLanguage('es')">🇪🇸 Español</a></li>
                             {% endif %}
                         </ul>
                     </li>
