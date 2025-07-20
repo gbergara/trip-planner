@@ -11,7 +11,7 @@ from .core.config import APP_NAME, APP_VERSION, APP_DESCRIPTION, TEMPLATES_DIR, 
 from .models.booking import Trip, Booking
 from .models.user import User
 from .routers import bookings, trips, auth
-from .routers import airports
+from .routers import airports, airlines
 from .routers.auth import get_current_user_optional
 from .services.i18n_service import translate as _, detect_language_from_request, get_language_names, get_supported_languages
 from .services.pdf_service import create_trip_pdf
@@ -23,7 +23,7 @@ app = FastAPI(
     version=APP_VERSION,
     contact={
         "name": "Trip Planner API",
-        "url": "https://github.com/your-repo/trip-planner",
+        "url": "https://github.com/gbergara/trip-planner",
     },
     license_info={
         "name": "MIT License",
@@ -41,24 +41,6 @@ app = FastAPI(
         {
             "name": "authentication", 
             "description": "**User Authentication** - Google OAuth2 integration with guest session support. Manage user accounts and session tokens.",
-        },
-        {
-            "name": "trips-api",
-            "description": "**Trip API (Legacy)** - Backward compatibility endpoints for trip operations without /api prefix.",
-        },
-        {
-            "name": "bookings-api", 
-            "description": "**Booking API (Legacy)** - Backward compatibility endpoints for booking operations without /api prefix.",
-        },
-    ],
-    servers=[
-        {
-            "url": "/",
-            "description": "Production server"
-        },
-        {
-            "url": "http://localhost:8000",
-            "description": "Development server"
         },
     ],
 )
@@ -92,6 +74,7 @@ templates = Jinja2Templates(directory=TEMPLATES_DIR)
 app.include_router(trips.router, prefix="/api")
 app.include_router(bookings.router, prefix="/api")
 app.include_router(airports.router, prefix="/api/airports")
+app.include_router(airlines.router, prefix="/api/airlines")
 
 # Include authentication router
 app.include_router(auth.router)
@@ -255,10 +238,6 @@ async def bookings_page(request: Request):
         "_": lambda text: _(text, language)
     })
 
-# Include routers without /api prefix for backward compatibility with tests
-# These come after the specific HTML routes to avoid conflicts
-app.include_router(trips.router, tags=["trips-api"])
-app.include_router(bookings.router, tags=["bookings-api"])
 
 @app.post("/set-language")
 async def set_language(request_body: dict, response: Response):

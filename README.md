@@ -510,64 +510,14 @@ curl -X POST http://localhost:8000/set-language -H "Content-Type: application/js
 ```
 
 ## 📄 Enhanced PDF Export System
+## 📖 API Documentation
 
-### Service Architecture
-The PDF system is now built as a dedicated service in `app/services/pdf_service.py`:
+All API endpoints are documented automatically by FastAPI.
 
-```python
-from app.services.pdf_service import create_trip_pdf
+- **Interactive API docs:** [http://localhost:8000/docs](http://localhost:8000/docs)
+- **OpenAPI schema:** [http://localhost:8000/openapi.json](http://localhost:8000/openapi.json)
 
-# Generate PDF
-pdf_buffer = create_trip_pdf(trip, bookings, language)
-```
-
-### Features
-- **Professional Service**: Isolated PDF generation logic
-- **Multi-Language**: Respects user's language preference
-- **Comprehensive Reports**: Trip details, bookings table, statistics
-- **Error Handling**: Graceful handling of PDF generation errors
-
-## 🔧 **Enhanced API Documentation**
-
-### Core Endpoints
-
-#### Trips
-```bash
-GET    /api/trips/           # List all trips (200)
-POST   /api/trips/           # Create new trip (201)
-GET    /api/trips/{id}       # Get trip details (200)
-PUT    /api/trips/{id}       # Update trip (200)
-DELETE /api/trips/{id}       # Delete trip (204)
-GET    /api/trips/{id}/bookings     # Get trip bookings (200)
-GET    /api/trips/{id}/bookings/    # Get trip bookings with trailing slash (200)
-GET    /api/trips/{id}/export/pdf   # Export trip to PDF (200)
-```
-
-#### Bookings
-```bash
-GET    /api/bookings/        # List all bookings (200)
-POST   /api/bookings/        # Create new booking (201)
-GET    /api/bookings/{id}    # Get booking details (200)
-PUT    /api/bookings/{id}    # Update booking (200)
-DELETE /api/bookings/{id}    # Delete booking (204)
-```
-
-#### Language Support
-```bash
-POST   /set-language         # Set language preference (JSON body)
-```
-
-#### Authentication
-```bash
-# Guest session management
-GET    /start-guest          # Create guest session & redirect to dashboard (302)
-GET    /                     # Home page - redirects to login if no session (302/200)
-GET    /login                # Login page with OAuth & guest options (200)
-
-# Google OAuth (if configured)
-GET    /auth/login           # Initiate Google OAuth flow (302 or 503 if disabled)
-GET    /auth/callback        # OAuth callback handler (302 success/error)
-POST   /auth/logout          # Logout authenticated user (200)
+Please refer to these URLs for the latest, complete, and accurate API documentation, including all endpoints, request/response models, and status codes.
 GET    /auth/logout          # Logout via GET redirect (302)
 GET    /auth/me              # Get current user info (200 or 401)
 
