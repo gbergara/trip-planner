@@ -1,11 +1,12 @@
 from sqlalchemy import Column, Integer, String, DateTime, Float, Enum, Text, ForeignKey, Boolean
+from sqlalchemy.dialects.postgresql import TIMESTAMP
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import enum
 import uuid
 
-from ..core.database import Base, get_uuid_type
+from ..core.database import Base, get_uuid_type, get_datetime_type
 
 class TripStatus(enum.Enum):
     PLANNING = "planning"
@@ -29,8 +30,8 @@ class Trip(Base):
     guest_session_id = Column(String(255), nullable=True, index=True)
     
     # Trip dates
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=True)
+    start_date = Column(get_datetime_type(), nullable=False)
+    end_date = Column(get_datetime_type(), nullable=True)
     
     # Destinations
     primary_destination = Column(String(200), nullable=True)
@@ -45,8 +46,8 @@ class Trip(Base):
     notes = Column(Text, nullable=True)
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(get_datetime_type(), default=datetime.utcnow)
+    updated_at = Column(get_datetime_type(), default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     user = relationship("User", back_populates="trips")  # Will be None for guest users
@@ -76,9 +77,9 @@ class Booking(Base):
     status = Column(Enum(BookingStatus), default=BookingStatus.PENDING)
     
     # Dates
-    booking_date = Column(DateTime, default=datetime.utcnow)
-    start_date = Column(DateTime, nullable=False)
-    end_date = Column(DateTime, nullable=True)
+    booking_date = Column(get_datetime_type(), default=datetime.utcnow)
+    start_date = Column(get_datetime_type(), nullable=False)
+    end_date = Column(get_datetime_type(), nullable=True)
     
     # Location info
     departure_location = Column(String(200), nullable=True)
@@ -120,8 +121,8 @@ class Booking(Base):
     pickup_location = Column(String(200), nullable=True)
     return_location = Column(String(200), nullable=True)
     
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(get_datetime_type(), default=datetime.utcnow)
+    updated_at = Column(get_datetime_type(), default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     trip = relationship("Trip", back_populates="bookings")
@@ -146,17 +147,17 @@ class Todo(Base):
     
     # Status
     completed = Column(Boolean, default=False)
-    completed_at = Column(DateTime, nullable=True)
+    completed_at = Column(get_datetime_type(), nullable=True)
     
     # Priority (1 = high, 2 = medium, 3 = low)
     priority = Column(Integer, default=2)
     
     # Due date (optional)
-    due_date = Column(DateTime, nullable=True)
+    due_date = Column(get_datetime_type(), nullable=True)
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(get_datetime_type(), default=datetime.utcnow)
+    updated_at = Column(get_datetime_type(), default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships  
     trip = relationship("Trip", back_populates="todos")

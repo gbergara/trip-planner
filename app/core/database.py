@@ -36,6 +36,17 @@ def get_uuid_type():
         # PostgreSQL/CockroachDB - use native UUID
         return UUID(as_uuid=True)
 
+def get_datetime_type():
+    """Get the appropriate datetime type with timezone support."""
+    if DATABASE_URL.startswith("sqlite"):
+        # SQLite doesn't support TIMESTAMP WITH TIME ZONE, use regular DateTime
+        from sqlalchemy import DateTime
+        return DateTime
+    else:
+        # PostgreSQL/CockroachDB - use TIMESTAMP WITH TIME ZONE
+        from sqlalchemy.dialects.postgresql import TIMESTAMP
+        return TIMESTAMP(timezone=True)
+
 # Create engine with appropriate settings based on database type
 if DATABASE_URL.startswith("sqlite"):
     # SQLite specific settings (local development only)

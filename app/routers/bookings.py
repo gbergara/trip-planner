@@ -110,7 +110,8 @@ def update_booking(booking_id: UUID, booking_update: BookingUpdate, db: Session 
     if booking is None:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    update_data = booking_update.model_dump(exclude_unset=True)
+    # Use exclude_none=False to include null values for clearing fields
+    update_data = booking_update.model_dump(exclude_unset=True, exclude_none=False)
     for field, value in update_data.items():
         setattr(booking, field, value)
     

@@ -22,12 +22,12 @@ app = FastAPI(
     version=APP_VERSION
 )
 
-# Initialize database tables on startup (only if not in testing mode)
-@app.on_event("startup")
-async def startup_event():
-    """Initialize database tables on application startup."""
-    if not os.getenv("TESTING"):
-        create_tables()
+# Database tables are now managed by Alembic migrations
+# @app.on_event("startup")
+# async def startup_event():
+#     """Initialize database tables on application startup."""
+#     if not os.getenv("TESTING"):
+#         create_tables()
 
 def get_user_language(request: Request) -> str:
     """Get user's preferred language from cookie or Accept-Language header."""

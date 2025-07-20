@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
 
-from ..core.database import Base, get_uuid_type
+from ..core.database import Base, get_uuid_type, get_datetime_type
 
 
 class User(Base):
@@ -36,9 +36,9 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     
     # Timestamps
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    last_login = Column(DateTime, nullable=True)
+    created_at = Column(get_datetime_type(), default=datetime.utcnow)
+    updated_at = Column(get_datetime_type(), default=datetime.utcnow, onupdate=datetime.utcnow)
+    last_login = Column(get_datetime_type(), nullable=True)
     
     # Relationships
     trips = relationship("Trip", back_populates="user", cascade="all, delete-orphan")

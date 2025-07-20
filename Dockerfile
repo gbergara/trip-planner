@@ -25,6 +25,10 @@ COPY app/ ./app/
 COPY tests/ ./tests/
 COPY pytest.ini ./
 
+# Copy Alembic configuration and migrations
+COPY alembic.ini ./
+COPY alembic/ ./alembic/
+
 # Create directory for SQLite database
 RUN mkdir -p /app/data
 

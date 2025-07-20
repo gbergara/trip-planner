@@ -13,7 +13,7 @@ services:
       - DATABASE_URL=cockroachdb://root@cockroachdb:26257/trip_planner?sslmode=disable
       - DB_DEBUG=false
     depends_on:
-      cockroach-init:
+      alembic-migrate:
         condition: service_completed_successfully
     restart: unless-stopped
     labels:
@@ -93,6 +93,18 @@ services:
     depends_on:
       cockroachdb:
         condition: service_healthy
+    restart: "no"
+
+  # Alembic database migration service
+  alembic-migrate:
+    build: .
+    container_name: trip-planner-migrate
+    environment:
+      - DATABASE_URL=cockroachdb://root@cockroachdb:26257/trip_planner?sslmode=disable
+    command: alembic upgrade head
+    depends_on:
+      cockroach-init:
+        condition: service_completed_successfully
     restart: "no"
 
   # Optional: Redis for caching and sessions

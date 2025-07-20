@@ -1,12 +1,13 @@
 # 🌍 Trip Planner - Enterprise-Grade Travel Management System
 
-A **professional, scalable** trip planning application built with **FastAPI**, **CockroachDB**, and **Bootstrap 5**. Features **enterprise-grade architecture**, full **multi-language support** (English/Spanish), **comprehensive testing suite**, and **professional PDF export** functionality.
+A **professional, scalable** trip planning application built with **FastAPI**, **CockroachDB**, and **Bootstrap 5**. Features **enterprise-grade architecture**, **timezone-aware database**, **flight connection intelligence**, full **multi-language support** (English/Spanish), **comprehensive testing suite**, and **professional PDF export** functionality.
 
 ![Trip Planner](https://img.shields.io/badge/Python-3.11+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Latest-green.svg)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
 ![CockroachDB](https://img.shields.io/badge/CockroachDB-Latest-orange.svg)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Testing-blue.svg)
+![Alembic](https://img.shields.io/badge/Alembic-Migrations-purple.svg)
 ![Multi-Language](https://img.shields.io/badge/i18n-EN%2FES-red.svg)
 ![Tests](https://img.shields.io/badge/Tests-95+_Passing-brightgreen.svg)
 
@@ -21,10 +22,28 @@ A **professional, scalable** trip planning application built with **FastAPI**, *
 
 ### 🎯 **Core Functionality**
 - **Trip Management**: Create, edit, delete, and organize trips with detailed information
-- **Booking Management**: Full CRUD operations for flights, accommodations, transport, and activities
+- **Smart Booking Management**: Full CRUD operations for flights, accommodations, transport, and activities
+- **TODO Task System**: Integrated task management with categories, priorities, and due dates
 - **UUID-based IDs**: Database-agnostic identifiers with proper type handling
 - **Clickable Navigation**: Trip titles link directly to booking management pages
 - **Robust Error Handling**: Proper HTTP status codes and foreign key constraint enforcement
+
+### ✈️ **Advanced Flight Management**
+- **Flight Grouping**: Automatically groups multiple flights on the same day
+- **Connection Time Intelligence**: Visual warnings for flight connection times
+  - 🔴 **Red Warning**: ≤1 hour (risky connection)
+  - 🟡 **Yellow Warning**: ≤2 hours (tight connection)
+  - 🟢 **Green Indicator**: >2 hours (comfortable connection)
+- **Airline Information**: Dedicated airline field with smart form display
+- **Flight Details**: Flight numbers, terminals, seat assignments
+- **Time Calculations**: Automatic layover and connection time calculations
+
+### ⏰ **Timezone-Aware Database**
+- **TIMESTAMPTZ Fields**: All datetime fields use timezone-aware storage
+- **Global Compatibility**: Handles dates/times consistently across all timezones
+- **Smart Date Handling**: Default dates auto-populate from trip dates
+- **No Date Drift**: Fixed timezone conversion issues preventing random date changes
+- **Database Migrations**: Alembic-managed schema with proper timezone support
 
 ### 🔐 **Advanced Authentication System**
 - **Guest Mode**: Full app functionality without registration - start planning immediately
@@ -59,8 +78,11 @@ A **professional, scalable** trip planning application built with **FastAPI**, *
 ### 🗄️ **Database & Performance**
 - **Multi-Database Support**: CockroachDB for production, PostgreSQL for testing, SQLite for development
 - **UUID Compatibility**: Smart UUID type handling across different database engines
+- **Alembic Migrations**: Professional database schema management with version control
+- **Timezone Support**: Native TIMESTAMPTZ fields for accurate datetime handling
 - **Proper Constraints**: Foreign key relationships with integrity enforcement
 - **Connection Pooling**: Optimized database connections with health checks
+- **Schema Evolution**: Clean migration path for database updates and rollbacks
 
 ### 🧪 **Comprehensive Testing**
 - **95+ Test Suite**: Complete test coverage including authentication, guest sessions, and OAuth flows
@@ -69,11 +91,23 @@ A **professional, scalable** trip planning application built with **FastAPI**, *
 - **Multiple Test Types**: Unit tests, integration tests, API tests, and PDF export tests
 - **Automated CI-Ready**: All tests designed for continuous integration
 
+### 📋 **TODO Task Management**
+- **Integrated Tasks**: TODO system built into each trip
+- **Task Categories**: Flight, Accommodation, Transport, Activity, Documents, Packing, Other
+- **Priority Levels**: High (1), Medium (2), Low (3) priority assignments
+- **Due Date Management**: Optional due dates with default current time
+- **Completion Tracking**: Mark tasks complete with automatic timestamps
+- **Smart Defaults**: Default due dates populate with current date/time
+- **Full CRUD**: Create, read, update, delete tasks with proper validation
+
 ### 🎨 **Modern UI/UX**
 - **Bootstrap 5**: Responsive, mobile-first design
 - **Bootstrap Icons**: Beautiful, consistent iconography
 - **Professional Themes**: Clean, modern color schemes
 - **Interactive Elements**: Modals, dropdowns, and dynamic content
+- **Smart Forms**: Context-sensitive fields (airline only for flights)
+- **Visual Feedback**: Connection time warnings with color-coded alerts
+- **Responsive Design**: Mobile-optimized flight grouping and task management
 
 ## 🚀 Quick Start
 
@@ -92,7 +126,7 @@ cd trip-planner
 
 2. **Start with Docker (Recommended)**
 ```bash
-# Start production environment
+# Start production environment (includes automatic Alembic migrations)
 docker-compose up -d
 
 # Or run tests
@@ -103,6 +137,39 @@ docker-compose --profile test up trip-planner-test --build
 - **Web Interface**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 - **Health Check**: http://localhost:8000/health
+
+## 🗄️ **Database Management**
+
+### **Alembic Migrations**
+The application now uses Alembic for professional database schema management:
+
+```bash
+# Check current migration status
+docker-compose exec trip-planner alembic current
+
+# View migration history  
+docker-compose exec trip-planner alembic history
+
+# Generate new migration (after model changes)
+docker-compose exec trip-planner alembic revision --autogenerate -m "Description"
+
+# Apply migrations manually (done automatically on startup)
+docker-compose exec trip-planner alembic upgrade head
+
+# Rollback migrations if needed
+docker-compose exec trip-planner alembic downgrade -1
+```
+
+### **Fresh Database Setup**
+To recreate the database with latest schema:
+
+```bash
+# Stop and remove volumes
+docker-compose down -v
+
+# Restart (automatically runs migrations)
+docker-compose up -d
+```
 
 ### Alternative: Local Development (SQLite - Zero Setup!)
 ```bash
@@ -755,29 +822,6 @@ services:
       TESTING: "true"
 ```
 
-## 🏆 **What's New**
-
-### ✅ Architecture Improvements
-- **Modular Design**: Clean separation into `core/`, `services/`, `models/`, `routers/`
-- **Service Layer**: Business logic isolated in dedicated services
-- **Configuration Management**: Centralized settings in `core/config.py`
-
-### ✅ Testing Infrastructure
-- **74 Comprehensive Tests**: Complete functionality coverage  
-- **PostgreSQL Testing**: Real database constraints and behavior
-- **Docker-Based Testing**: Isolated, reproducible test environment
-
-### ✅ Database Enhancements  
-- **🎯 Three-Database Strategy**: SQLite (dev), PostgreSQL (test), CockroachDB (prod)
-- **🚀 Zero-Setup Development**: SQLite works immediately - no Docker required
-- **🔄 Smart Database Switching**: Automatic adaptation to any database engine
-- **🛡️ UUID Type Handling**: Seamless UUID compatibility across all database types
-- **⚙️ Proper Constraints**: Foreign key enforcement and relationship integrity
-
-### ✅ Code Quality
-- **Professional Structure**: Enterprise-grade architecture patterns
-- **Error Handling**: Proper HTTP status codes and exception handling
-- **Type Safety**: Enhanced UUID handling and validation
 
 ## 📄 License
 
@@ -794,8 +838,8 @@ This project is licensed under the MIT License. See LICENSE file for details.
 
 ---
 
-**🎯 Enterprise-Ready Trip Planning! 🌍✈️🏨**
+**🎯 Enterprise-Ready Trip Planning with Flight Intelligence! 🌍✈️🏨**
 
-**✅ 74 Tests Passing | 🏗️ Professional Architecture | 🌍 Multi-Language | 📄 PDF Export**
+**✅ 95+ Tests Passing | ⏰ Timezone-Aware | ✈️ Flight Grouping | 📋 TODO System | 🌍 Multi-Language | 📄 PDF Export**
 
 For support or questions, please open an issue in the GitHub repository. 

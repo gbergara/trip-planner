@@ -214,6 +214,10 @@
                             <label for="confirmation_number" class="form-label">Confirmation Number</label>
                             <input type="text" class="form-control" id="confirmation_number" name="confirmation_number">
                         </div>
+                        <div class="col-md-6" id="airline_field" style="display: none;">
+                            <label for="airline" class="form-label">{% if _ %}{{ _("Airline") }}{% else %}Airline{% endif %}</label>
+                            <input type="text" class="form-control" id="airline" name="airline" placeholder="e.g., Lufthansa, American Airlines">
+                        </div>
                         <div class="col-12">
                             <label for="notes" class="form-label">Notes</label>
                             <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
@@ -318,6 +322,25 @@ function setupEventListeners() {
     
     // Form submission
     document.getElementById('bookingForm').addEventListener('submit', handleFormSubmit);
+    
+    // Show/hide airline field based on booking type
+    document.getElementById('booking_type').addEventListener('change', function() {
+        toggleAirlineField();
+    });
+}
+
+// Toggle airline field visibility based on booking type
+function toggleAirlineField() {
+    const bookingType = document.getElementById('booking_type').value;
+    const airlineField = document.getElementById('airline_field');
+    
+    if (bookingType === 'flight') {
+        airlineField.style.display = 'block';
+    } else {
+        airlineField.style.display = 'none';
+        // Clear airline field when not a flight
+        document.getElementById('airline').value = '';
+    }
 }
 
 // Load bookings for this trip
@@ -565,6 +588,7 @@ function createBookingCard(booking, isGrouped = false) {
                         <span class="me-2"><i class="bi bi-${isGrouped && booking.booking_type === 'flight' ? 'clock' : 'calendar'}"></i> ${dateTimeDisplay}</span>
                         ${booking.departure_location ? `<span class="me-2"><i class="bi bi-geo-alt"></i> ${booking.departure_location}</span>` : ''}
                         ${booking.arrival_location && booking.departure_location !== booking.arrival_location ? `<span class="me-2"><i class="bi bi-arrow-right"></i> ${booking.arrival_location}</span>` : ''}
+                        ${booking.airline ? `<span class="me-2"><i class="bi bi-airplane"></i> ${booking.airline}</span>` : ''}
                         ${booking.confirmation_number ? `<span><i class="bi bi-hash"></i> ${booking.confirmation_number}</span>` : ''}
                     </div>
                 </div>
@@ -645,6 +669,9 @@ function showCreateBookingModal() {
     document.getElementById('start_date').value = startDateTime;
     document.getElementById('end_date').value = endDateTime;
     
+    // Show/hide airline field based on default booking type
+    toggleAirlineField();
+    
     const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
     modal.show();
 }
@@ -667,7 +694,11 @@ async function editBooking(bookingId) {
         document.getElementById('departure_location').value = booking.departure_location || '';
         document.getElementById('arrival_location').value = booking.arrival_location || '';
         document.getElementById('confirmation_number').value = booking.confirmation_number || '';
+        document.getElementById('airline').value = booking.airline || '';
         document.getElementById('notes').value = booking.notes || '';
+        
+        // Show/hide airline field based on booking type
+        toggleAirlineField();
         
         // Handle start_date
         if (booking.start_date) {
@@ -725,13 +756,24 @@ async function handleFormSubmit(e) {
     
     // Build booking data object
     for (let [key, value] of formData.entries()) {
-        if (value.trim() !== '') {
-            if (key === 'price') {
-                bookingData[key] = parseFloat(value);
-            } else if (key === 'start_date' || key === 'end_date') {
+        // Always include these fields even if empty (to allow clearing them)
+        const alwaysIncludeFields = ['notes', 'description', 'confirmation_number', 'airline'];
+        
+        // For date fields, only include if not empty (but handle them specially)
+        if (key === 'start_date' || key === 'end_date') {
+            if (value.trim() !== '') {
+                // Convert datetime-local input to ISO string (database will handle timezone)
                 bookingData[key] = new Date(value).toISOString();
+            }
+            // Skip to next iteration if date field is empty
+            continue;
+        }
+        
+        if (value.trim() !== '' || alwaysIncludeFields.includes(key)) {
+            if (key === 'price') {
+                bookingData[key] = parseFloat(value) || null;
             } else {
-                bookingData[key] = value;
+                bookingData[key] = value.trim() || null;
             }
         }
     }
