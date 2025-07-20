@@ -1,0 +1,454 @@
+# Spanish translations for Trip Planner
+# Copyright (C) 2024
+# This file is distributed under the same license as the Trip Planner package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Trip Planner 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 12:00+0000\n"
+"PO-Revision-Date: 2025-01-01 12:00+0000\n"
+"Last-Translator: Auto <auto@example.com>\n"
+"Language: es\n"
+"Language-Team: Spanish\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Dashboard and navigation
+msgid "Dashboard"
+msgstr "Panel de Control"
+
+msgid "Trip Planner"
+msgstr "Planificador de Viajes"
+
+msgid "My Trips"
+msgstr "Mis Viajes"
+
+msgid "All Bookings"
+msgstr "Todas las Reservas"
+
+msgid "Settings"
+msgstr "Configuración"
+
+msgid "Trip Planning Made Easy"
+msgstr "Planificación de Viajes Fácil"
+
+msgid "Language"
+msgstr "Idioma"
+
+# Trip management
+msgid "Trips"
+msgstr "Viajes"
+
+msgid "Add Trip"
+msgstr "Agregar Viaje"
+
+msgid "Edit Trip"
+msgstr "Editar Viaje"
+
+msgid "Delete Trip"
+msgstr "Eliminar Viaje"
+
+msgid "Trip Name"
+msgstr "Nombre del Viaje"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Start Date"
+msgstr "Fecha de Inicio"
+
+msgid "End Date"
+msgstr "Fecha de Fin"
+
+msgid "Primary Destination"
+msgstr "Destino Principal"
+
+msgid "Budget"
+msgstr "Presupuesto"
+
+msgid "Currency"
+msgstr "Moneda"
+
+msgid "Traveler Count"
+msgstr "Número de Viajeros"
+
+msgid "Status"
+msgstr "Estado"
+
+msgid "Notes"
+msgstr "Notas"
+
+# Booking management
+msgid "Bookings"
+msgstr "Reservas"
+
+msgid "Add Booking"
+msgstr "Agregar Reserva"
+
+msgid "Edit Booking"
+msgstr "Editar Reserva"
+
+msgid "Delete Booking"
+msgstr "Eliminar Reserva"
+
+msgid "Booking Title"
+msgstr "Título de la Reserva"
+
+msgid "Type"
+msgstr "Tipo"
+
+msgid "Flight"
+msgstr "Vuelo"
+
+msgid "Accommodation"
+msgstr "Alojamiento"
+
+msgid "Car Rental"
+msgstr "Alquiler de Coche"
+
+msgid "Restaurant"
+msgstr "Restaurante"
+
+msgid "Restaurant Address"
+msgstr "Dirección del Restaurante"
+
+msgid "Table Location"
+msgstr "Ubicación de Mesa"
+
+msgid "Restaurant address"
+msgstr "Dirección del restaurante"
+
+msgid "Table or seating area"
+msgstr "Mesa o área de asientos"
+
+msgid "Activity"
+msgstr "Actividad"
+
+msgid "Other"
+msgstr "Otro"
+
+msgid "Departure Location"
+msgstr "Lugar de Salida"
+
+msgid "Arrival Location"
+msgstr "Lugar de Llegada"
+
+msgid "Confirmation Number"
+msgstr "Número de Confirmación"
+
+msgid "Price"
+msgstr "Precio"
+
+# Status values
+msgid "Planning"
+msgstr "Planificando"
+
+msgid "Confirmed"
+msgstr "Confirmado"
+
+msgid "Completed"
+msgstr "Completado"
+
+msgid "Cancelled"
+msgstr "Cancelado"
+
+msgid "Pending"
+msgstr "Pendiente"
+
+# Actions
+msgid "Save"
+msgstr "Guardar"
+
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgid "Update"
+msgstr "Actualizar"
+
+msgid "Create"
+msgstr "Crear"
+
+msgid "View"
+msgstr "Ver"
+
+msgid "Export to PDF"
+msgstr "Exportar a PDF"
+
+msgid "Back to Trips"
+msgstr "Volver a Viajes"
+
+# Statistics
+msgid "Total Bookings"
+msgstr "Total de Reservas"
+
+msgid "Total Cost"
+msgstr "Costo Total"
+
+msgid "Recent Trips"
+msgstr "Viajes Recientes"
+
+# Search and filters
+msgid "Search bookings..."
+msgstr "Buscar reservas..."
+
+msgid "All Types"
+msgstr "Todos los Tipos"
+
+msgid "All Statuses"
+msgstr "Todos los Estados"
+
+# Messages
+msgid "Trip created successfully!"
+msgstr "¡Viaje creado exitosamente!"
+
+msgid "Trip updated successfully!"
+msgstr "¡Viaje actualizado exitosamente!"
+
+msgid "Trip deleted successfully!"
+msgstr "¡Viaje eliminado exitosamente!"
+
+msgid "Booking created successfully!"
+msgstr "¡Reserva creada exitosamente!"
+
+msgid "Booking updated successfully!"
+msgstr "¡Reserva actualizada exitosamente!"
+
+msgid "Booking deleted successfully!"
+msgstr "¡Reserva eliminada exitosamente!"
+
+msgid "PDF exported successfully!"
+msgstr "¡PDF exportado exitosamente!"
+
+msgid "Failed to load trip details"
+msgstr "Error al cargar detalles del viaje"
+
+msgid "Trip not found"
+msgstr "Viaje no encontrado"
+
+msgid "No bookings yet"
+msgstr "Aún no hay reservas"
+
+msgid "Start by adding your first booking for this trip."
+msgstr "Comienza agregando tu primera reserva para este viaje."
+
+msgid "Add First Booking"
+msgstr "Agregar Primera Reserva"
+
+msgid "Total Trips"
+msgstr "Total de Viajes"
+
+msgid "New Trip"
+msgstr "Nuevo Viaje"
+
+msgid "View All"
+msgstr "Ver Todo"
+
+msgid "Quick Actions"
+msgstr "Acciones Rápidas"
+
+msgid "View All Trips"
+msgstr "Ver Todos los Viajes"
+
+msgid "Trip Statistics"
+msgstr "Estadísticas del Viaje"
+
+msgid "About"
+msgstr "Acerca de"
+
+msgid "In Progress"
+msgstr "En Curso"
+
+msgid "Search"
+msgstr "Buscar"
+
+msgid "Search trips..."
+msgstr "Buscar viajes..."
+
+msgid "Sort By"
+msgstr "Ordenar Por"
+
+msgid "Created Date"
+msgstr "Fecha de Creación"
+
+msgid "Clear Filters"
+msgstr "Limpiar Filtros"
+
+msgid "e.g., Summer Vacation to Europe"
+msgstr "ej., Vacaciones de Verano en Europa"
+
+msgid "e.g., Paris, France"
+msgstr "ej., París, Francia"
+
+msgid "Total budget for the trip"
+msgstr "Presupuesto total para el viaje"
+
+msgid "Brief description of the trip"
+msgstr "Breve descripción del viaje"
+
+msgid "Destinations List"
+msgstr "Lista de Destinos"
+
+msgid "List of all destinations (one per line)"
+msgstr "Lista de todos los destinos (uno por línea)"
+
+msgid "Enter each destination on a separate line"
+msgstr "Ingrese cada destino en una línea separada"
+
+msgid "Any additional notes or reminders"
+msgstr "Notas adicionales o recordatorios"
+
+msgid "Create Trip"
+msgstr "Crear Viaje"
+
+msgid "Loading bookings..."
+msgstr "Cargando reservas..."
+
+msgid "Select Trip"
+msgstr "Seleccionar Viaje"
+
+msgid "Trip"
+msgstr "Viaje"
+
+msgid "Start by adding your first booking."
+msgstr "Comienza agregando tu primera reserva."
+
+msgid "Unknown Trip"
+msgstr "Viaje Desconocido"
+
+msgid "Address"
+msgstr "Dirección"
+
+msgid "Check-in Location"
+msgstr "Lugar de Registro"
+
+msgid "Hotel address or location"
+msgstr "Dirección del hotel o ubicación"
+
+msgid "Specific check-in location"
+msgstr "Ubicación específica de registro"
+
+msgid "Departure Airport"
+msgstr "Aeropuerto de Salida"
+
+msgid "Arrival Airport"
+msgstr "Aeropuerto de Llegada"
+
+msgid "Departure airport code or name"
+msgstr "Código o nombre del aeropuerto de salida"
+
+msgid "Arrival airport code or name"
+msgstr "Código o nombre del aeropuerto de llegada"
+
+msgid "Pick-up Location"
+msgstr "Lugar de Recogida"
+
+msgid "Drop-off Location"
+msgstr "Lugar de Entrega"
+
+msgid "Where to pick up"
+msgstr "Dónde recoger"
+
+msgid "Where to drop off"
+msgstr "Dónde entregar"
+
+msgid "Meeting Point"
+msgstr "Punto de Encuentro"
+
+msgid "Activity Location"
+msgstr "Ubicación de la Actividad"
+
+msgid "Where to meet"
+msgstr "Dónde encontrarse"
+
+msgid "Activity venue or location"
+msgstr "Local o ubicación de la actividad"
+
+msgid "From Location"
+msgstr "Desde Ubicación"
+
+msgid "To Location"
+msgstr "Hacia Ubicación"
+
+msgid "Starting location"
+msgstr "Ubicación de inicio"
+
+msgid "Destination location"
+msgstr "Ubicación de destino"
+
+# Authentication
+msgid "Login"
+msgstr "Iniciar Sesión"
+
+msgid "Sign In"
+msgstr "Iniciar Sesión"
+
+msgid "Sign Out"
+msgstr "Cerrar Sesión"
+
+msgid "Logout"
+msgstr "Cerrar Sesión"
+
+msgid "Welcome back! Sign in to continue planning your trips."
+msgstr "¡Bienvenido de nuevo! Inicia sesión para continuar planificando tus viajes."
+
+msgid "Continue with Google"
+msgstr "Continuar con Google"
+
+msgid "Continue as Guest"
+msgstr "Continuar como Invitado"
+
+msgid "Start Using Trip Planner"
+msgstr "Comenzar a Usar Trip Planner"
+
+msgid "or"
+msgstr "o"
+
+msgid "Guest User"
+msgstr "Usuario Invitado"
+
+msgid "You're browsing as a guest"
+msgstr "Estás navegando como invitado"
+
+msgid "Sign In with Google"
+msgstr "Iniciar Sesión con Google"
+
+msgid "About Guest Mode"
+msgstr "Acerca del Modo Invitado"
+
+msgid "Google Authentication is not configured. You can still use the app as a guest!"
+msgstr "La autenticación de Google no está configurada. ¡Aún puedes usar la aplicación como invitado!"
+
+# Guest mode information
+msgid "Guest Mode Info"
+msgstr "Información del Modo Invitado"
+
+msgid "Your trips are saved for 30 days in your browser"
+msgstr "Tus viajes se guardan por 30 días en tu navegador"
+
+msgid "Data is not synced across devices"
+msgstr "Los datos no se sincronizan entre dispositivos"
+
+msgid "Sign in with Google to save permanently and sync across devices"
+msgstr "Inicia sesión con Google para guardar permanentemente y sincronizar entre dispositivos"
+
+msgid "Guest trips can be converted to your account after signing in"
+msgstr "Los viajes de invitado se pueden convertir a tu cuenta después de iniciar sesión"
+
+# Authentication status
+msgid "Not authenticated"
+msgstr "No autenticado"
+
+msgid "Successfully logged out"
+msgstr "Sesión cerrada exitosamente"
+
+msgid "Authentication failed"
+msgstr "Falló la autenticación"
+
+msgid "Invalid authentication credentials"
+msgstr "Credenciales de autenticación inválidas"
+
+msgid "Session expired"
+msgstr "Sesión expirada" 

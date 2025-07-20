@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="{{ language }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if _ %}{{ _("Login") }}{% else %}Login{% endif %} - Trip Planner</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', path='/css/style.css') }}" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2.5rem;
+            text-align: center;
+        }
+        
+        .login-header {
+            margin-bottom: 2rem;
+        }
+        
+        .login-title {
+            color: #2c3e50;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-subtitle {
+            color: #6c757d;
+            font-size: 1rem;
+            margin-bottom: 0;
+        }
+        
+        .google-login-btn {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .google-login-btn:hover {
+            background: #f8f9fa;
+            border-color: #4285f4;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(66, 133, 244, 0.1);
+            color: #333;
+            text-decoration: none;
+        }
+        
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0xNy42NCA5LjIwNWMwLS42MzktLjA1Ny0xLjI1Mi0uMTY0LTEuODQxSDl2My40ODFoNC44NDRjLS4yMDkgMS4xMjUtLjg0NCAyLjA4LTEuNzk2IDIuNzE3djIuMjU4aDIuOTA4YzEuNzAyLTEuNTY3IDIuNjg0LTMuODc1IDIuNjg0LTYuNjE1eiIgZmlsbD0iIzQyODVGNCIvPjxwYXRoIGQ9Ik05IDE4YzIuNDMgMCA0LjQ2Ny0uODA2IDUuOTU2LTIuMTgxbC0yLjkwOC0yLjI1OGMtLjgwNi41NzgtMS44NzYuOTEtMy4wNDguOTEtMi4zNDQgMC00LjMyOC0xLjU4NC01LjAzNi0zLjcxSDEuOTU3djIuMzMyQzMuNDM4IDE1Ljk4MyA2LjAzOCAxOCA5IDE4eiIgZmlsbD0iIzM0QTg1MyIvPjxwYXRoIGQ9Ik0zLjk2NCAxMC43MWMtLjE4LS41NDMtLjI4Mi0xLjEyMi0uMjgyLTEuNzFzLjEwMi0xLjE2Ny4yODItMS43MVY0Ljk1OEgxLjk1N0E4Ljk5NiA4Ljk5NiAwIDAgMCAwIDljMCAxLjQ1NC4zNDggMi44MjcuOTU3IDQuMDQyTDMuOTY0IDEwLjcxeiIgZmlsbD0iI0ZCQkMwNCIvPjxwYXRoIGQ9Ik05IDMuNThjMS4zMjEgMCAyLjUwOC40NTQgMy40NCAxLjM0NWwyLjU4Mi0yLjU4QzEzLjQ2My44OTEgMTEuNDI2IDAgOSAwQzYuMDM4IDAgMy40MzggMi4wMTcgMS45NTcgNC45NThsMS4wMDYgMi4zNTFDMy42NzIgNS4xNjMgNS42NTYgMy41OCA5IDMuNTh6IiBmaWxsPSIjRUE0MzM1Ii8+PC9nPjwvc3ZnPg==") center/contain no-repeat;
+        }
+        
+        .features {
+            text-align: left;
+            margin-top: 1.5rem;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 0.75rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .feature-icon {
+            color: #28a745;
+            font-size: 1.1rem;
+            width: 16px;
+        }
+        
+        .login-divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        
+        .login-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+        
+        .login-divider span {
+            background: rgba(255, 255, 255, 0.95);
+            color: #6c757d;
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .guest-login-btn {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #495057;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .guest-login-btn:hover {
+            background: #e9ecef;
+            border-color: #6c757d;
+            transform: translateY(-1px);
+            color: #495057;
+            text-decoration: none;
+        }
+        
+        .error-alert {
+            background-color: #ffe6e6;
+            border: 1px solid #ff9999;
+            color: #cc0000;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .app-preview {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .app-preview h6 {
+            color: #6c757d;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            .login-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="login-container">
+                    <div class="login-card">
+                        <!-- Header -->
+                        <div class="login-header">
+                            <div class="login-title">
+                                <i class="bi bi-geo-alt text-primary me-2"></i>
+                                Trip Planner
+                            </div>
+                            <p class="login-subtitle">
+                                {% if _ %}{{ _("Welcome back! Sign in to continue planning your trips.") }}{% else %}Welcome back! Sign in to continue planning your trips.{% endif %}
+                            </p>
+                        </div>
+                        
+                        <!-- Error Message -->
+                        {% if error %}
+                        <div class="error-alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            {% if error == "authentication_failed" %}
+                                {% if _ %}{{ _("Authentication failed. Please try again.") }}{% else %}Authentication failed. Please try again.{% endif %}
+                            {% else %}
+                                {% if _ %}{{ _("An error occurred. Please try again.") }}{% else %}An error occurred. Please try again.{% endif %}
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if oauth_enabled %}
+                        <!-- Google Login Button -->
+                        <a href="/auth/login" class="google-login-btn">
+                            <div class="google-icon"></div>
+                            {% if _ %}{{ _("Continue with Google") }}{% else %}Continue with Google{% endif %}
+                        </a>
+                        
+                        <!-- Divider -->
+                        <div class="login-divider">
+                            <span>{% if _ %}{{ _("or") }}{% else %}or{% endif %}</span>
+                        </div>
+                        
+                        <!-- Guest Login Button -->
+                        <a href="/start-guest" class="guest-login-btn">
+                            <i class="bi bi-person"></i>
+                            {% if _ %}{{ _("Continue as Guest") }}{% else %}Continue as Guest{% endif %}
+                        </a>
+                        {% else %}
+                        <!-- OAuth Disabled - Show Guest Only -->
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle me-2"></i>
+                            {% if _ %}{{ _("Google Authentication is not configured. You can still use the app as a guest!") }}{% else %}Google Authentication is not configured. You can still use the app as a guest!{% endif %}
+                        </div>
+                        
+                        <!-- Guest Login Button (Primary) -->
+                        <a href="/start-guest" class="google-login-btn" style="background: #28a745; border-color: #28a745;">
+                            <i class="bi bi-person" style="font-size: 20px;"></i>
+                            {% if _ %}{{ _("Start Using Trip Planner") }}{% else %}Start Using Trip Planner{% endif %}
+                        </a>
+                        {% endif %}
+                        
+                        <!-- Features -->
+                        <div class="features">
+                            <div class="feature-item">
+                                <i class="bi bi-check-circle feature-icon"></i>
+                                <span>{% if _ %}{{ _("Secure authentication with Google") }}{% else %}Secure authentication with Google{% endif %}</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-check-circle feature-icon"></i>
+                                <span>{% if _ %}{{ _("Organize trips and bookings") }}{% else %}Organize trips and bookings{% endif %}</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-check-circle feature-icon"></i>
+                                <span>{% if _ %}{{ _("Export professional PDF reports") }}{% else %}Export professional PDF reports{% endif %}</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-check-circle feature-icon"></i>
+                                <span>{% if _ %}{{ _("Multi-language support") }}{% else %}Multi-language support{% endif %}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- App Preview -->
+                        <div class="app-preview">
+                            <h6>{% if _ %}{{ _("Your personal travel companion") }}{% else %}Your personal travel companion{% endif %}</h6>
+                            <p class="text-muted small">
+                                {% if _ %}{{ _("Keep all your travel plans organized in one place. From flights to hotels, manage everything with ease.") }}{% else %}Keep all your travel plans organized in one place. From flights to hotels, manage everything with ease.{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Check for URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        
+        if (error === 'authentication_failed') {
+            // The error is already shown in the template
+            // Could add additional client-side handling here
+        }
+        
+        // Add loading state to Google login button
+        document.querySelector('.google-login-btn').addEventListener('click', function() {
+            this.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div>{% if _ %}{{ _("Signing in...") }}{% else %}Signing in...{% endif %}';
+            this.style.pointerEvents = 'none';
+        });
+    </script>
+</body>
+</html> 

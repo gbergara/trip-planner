@@ -1,0 +1,596 @@
+{% extends "base.html" %}
+
+{% block title %}{% if _ %}{{ _("All Bookings") }}{% else %}All Bookings{% endif %} - Trip Planner{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">
+        <i class="bi bi-calendar-check me-2"></i>
+        {% if _ %}{{ _("All Bookings") }}{% else %}All Bookings{% endif %}
+    </h1>
+    <button class="btn btn-primary" onclick="showCreateBookingModal()">
+        <i class="bi bi-plus-circle me-2"></i>
+        {% if _ %}{{ _("Add Booking") }}{% else %}New Booking{% endif %}
+    </button>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="filterType" class="form-label">{% if _ %}{{ _("Type") }}{% else %}Type{% endif %}</label>
+                <select id="filterType" class="form-select">
+                    <option value="">{% if _ %}{{ _("All Types") }}{% else %}All Types{% endif %}</option>
+                    <option value="flight">{% if _ %}{{ _("Flight") }}{% else %}Flights{% endif %}</option>
+                    <option value="accommodation">{% if _ %}{{ _("Accommodation") }}{% else %}Accommodations{% endif %}</option>
+                                                    <option value="car_rental">{% if _ %}{{ _("Car Rental") }}{% else %}Car Rental{% endif %}</option>
+                                <option value="restaurant">{% if _ %}{{ _("Restaurant") }}{% else %}Restaurant{% endif %}</option>
+                    <option value="activity">{% if _ %}{{ _("Activity") }}{% else %}Activities{% endif %}</option>
+                    <option value="other">{% if _ %}{{ _("Other") }}{% else %}Other{% endif %}</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterStatus" class="form-label">{% if _ %}{{ _("Status") }}{% else %}Status{% endif %}</label>
+                <select id="filterStatus" class="form-select">
+                    <option value="">{% if _ %}{{ _("All Statuses") }}{% else %}All Status{% endif %}</option>
+                    <option value="confirmed">{% if _ %}{{ _("Confirmed") }}{% else %}Confirmed{% endif %}</option>
+                    <option value="pending">{% if _ %}{{ _("Pending") }}{% else %}Pending{% endif %}</option>
+                    <option value="cancelled">{% if _ %}{{ _("Cancelled") }}{% else %}Cancelled{% endif %}</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="searchInput" class="form-label">{% if _ %}{{ _("Search") }}{% else %}Search{% endif %}</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="{% if _ %}{{ _('Search bookings...') }}{% else %}Search bookings...{% endif %}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-outline-secondary d-block" onclick="clearFilters()">{% if _ %}{{ _("Clear Filters") }}{% else %}Clear Filters{% endif %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bookings List -->
+<div class="card">
+    <div class="card-body">
+        <div id="bookings-container">
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2 text-muted">{% if _ %}{{ _("Loading bookings...") }}{% else %}Loading bookings...{% endif %}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">{% if _ %}{{ _("Add Booking") }}{% else %}New Booking{% endif %}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="bookingForm">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label for="title" class="form-label">{% if _ %}{{ _("Booking Title") }}{% else %}Title{% endif %} *</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="booking_type" class="form-label">{% if _ %}{{ _("Type") }}{% else %}Type{% endif %} *</label>
+                            <select class="form-select" id="booking_type" name="booking_type" required onchange="updateLocationLabels()">
+                                <option value="">Select Type</option>
+                                <option value="flight">{% if _ %}{{ _("Flight") }}{% else %}Flight{% endif %}</option>
+                                <option value="accommodation">{% if _ %}{{ _("Accommodation") }}{% else %}Accommodation{% endif %}</option>
+                                <option value="car_rental">{% if _ %}{{ _("Car Rental") }}{% else %}Car Rental{% endif %}</option>
+                                <option value="restaurant">{% if _ %}{{ _("Restaurant") }}{% else %}Restaurant{% endif %}</option>
+                                <option value="activity">{% if _ %}{{ _("Activity") }}{% else %}Activity{% endif %}</option>
+                                <option value="other">{% if _ %}{{ _("Other") }}{% else %}Other{% endif %}</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-12">
+                            <label for="trip_id" class="form-label">{% if _ %}{{ _("Trip") }}{% else %}Trip{% endif %} *</label>
+                            <select class="form-select" id="trip_id" name="trip_id" required>
+                                <option value="">{% if _ %}{{ _("Select Trip") }}{% else %}Select Trip{% endif %}</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">{% if _ %}{{ _("Start Date") }}{% else %}Start Date{% endif %} *</label>
+                            <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">{% if _ %}{{ _("End Date") }}{% else %}End Date{% endif %}</label>
+                            <input type="datetime-local" class="form-control" id="end_date" name="end_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="departure_location" class="form-label" id="departure_location_label">{% if _ %}{{ _("Departure Location") }}{% else %}Departure Location{% endif %}</label>
+                            <input type="text" class="form-control" id="departure_location" name="departure_location" placeholder="">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="arrival_location" class="form-label" id="arrival_location_label">{% if _ %}{{ _("Arrival Location") }}{% else %}Arrival Location{% endif %}</label>
+                            <input type="text" class="form-control" id="arrival_location" name="arrival_location" placeholder="">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="status" class="form-label">{% if _ %}{{ _("Status") }}{% else %}Status{% endif %}</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="pending">{% if _ %}{{ _("Pending") }}{% else %}Pending{% endif %}</option>
+                                <option value="confirmed">{% if _ %}{{ _("Confirmed") }}{% else %}Confirmed{% endif %}</option>
+                                <option value="cancelled">{% if _ %}{{ _("Cancelled") }}{% else %}Cancelled{% endif %}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirmation_number" class="form-label">{% if _ %}{{ _("Confirmation Number") }}{% else %}Confirmation Number{% endif %}</label>
+                            <input type="text" class="form-control" id="confirmation_number" name="confirmation_number">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="price" class="form-label">{% if _ %}{{ _("Price") }}{% else %}Price{% endif %}</label>
+                            <input type="number" class="form-control" id="price" name="price" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="currency" class="form-label">{% if _ %}{{ _("Currency") }}{% else %}Currency{% endif %}</label>
+                            <select class="form-select" id="currency" name="currency">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="CAD">CAD</option>
+                                <option value="AUD">AUD</option>
+                                <option value="JPY">JPY</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label for="notes" class="form-label">{% if _ %}{{ _("Notes") }}{% else %}Notes{% endif %}</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% if _ %}{{ _("Cancel") }}{% else %}Cancel{% endif %}</button>
+                    <button type="submit" class="btn btn-primary" id="submitButton">{% if _ %}{{ _("Add Booking") }}{% else %}Add Booking{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Global variables
+let currentBookings = [];
+let currentTrips = [];
+let editingBookingId = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadTrips();
+    loadBookings();
+    setupEventListeners();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    // Search and filters
+    document.getElementById('searchInput').addEventListener('input', filterBookings);
+    document.getElementById('filterType').addEventListener('change', filterBookings);
+    document.getElementById('filterStatus').addEventListener('change', filterBookings);
+    
+    // Form submission
+    document.getElementById('bookingForm').addEventListener('submit', handleFormSubmit);
+}
+
+// Load trips for the dropdown
+async function loadTrips() {
+    try {
+        currentTrips = await TripPlanner.api.get('/trips/');
+        populateTripSelect();
+    } catch (error) {
+        console.error('Error loading trips:', error);
+        TripPlanner.showAlert('Failed to load trips: ' + error.message, 'danger');
+    }
+}
+
+// Populate trip select dropdown
+function populateTripSelect() {
+    const select = document.getElementById('trip_id');
+    select.innerHTML = '<option value="">{% if _ %}{{ _("Select Trip") }}{% else %}Select Trip{% endif %}</option>';
+    
+    currentTrips.forEach(trip => {
+        const option = document.createElement('option');
+        option.value = trip.id;
+        option.textContent = trip.name;
+        select.appendChild(option);
+    });
+}
+
+// Update location field labels based on booking type
+function updateLocationLabels() {
+    const bookingType = document.getElementById('booking_type').value;
+    const departureLabel = document.getElementById('departure_location_label');
+    const arrivalLabel = document.getElementById('arrival_location_label');
+    const departureInput = document.getElementById('departure_location');
+    const arrivalInput = document.getElementById('arrival_location');
+    
+    switch(bookingType) {
+        case 'accommodation':
+            departureLabel.textContent = '{% if _ %}{{ _("Address") }}{% else %}Address{% endif %}';
+            arrivalLabel.textContent = '{% if _ %}{{ _("Check-in Location") }}{% else %}Check-in Location{% endif %}';
+            departureInput.placeholder = '{% if _ %}{{ _("Hotel address or location") }}{% else %}Hotel address or location{% endif %}';
+            arrivalInput.placeholder = '{% if _ %}{{ _("Specific check-in location") }}{% else %}Specific check-in location{% endif %}';
+            break;
+        case 'flight':
+            departureLabel.textContent = '{% if _ %}{{ _("Departure Airport") }}{% else %}Departure Airport{% endif %}';
+            arrivalLabel.textContent = '{% if _ %}{{ _("Arrival Airport") }}{% else %}Arrival Airport{% endif %}';
+            departureInput.placeholder = '{% if _ %}{{ _("Departure airport code or name") }}{% else %}Departure airport code or name{% endif %}';
+            arrivalInput.placeholder = '{% if _ %}{{ _("Arrival airport code or name") }}{% else %}Arrival airport code or name{% endif %}';
+            break;
+        case 'car_rental':
+            departureLabel.textContent = '{% if _ %}{{ _("Pick-up Location") }}{% else %}Pick-up Location{% endif %}';
+            arrivalLabel.textContent = '{% if _ %}{{ _("Drop-off Location") }}{% else %}Drop-off Location{% endif %}';
+            departureInput.placeholder = '{% if _ %}{{ _("Where to pick up") }}{% else %}Where to pick up{% endif %}';
+            arrivalInput.placeholder = '{% if _ %}{{ _("Where to drop off") }}{% else %}Where to drop off{% endif %}';
+            break;
+        case 'restaurant':
+            departureLabel.textContent = '{% if _ %}{{ _("Restaurant Address") }}{% else %}Restaurant Address{% endif %}';
+            arrivalLabel.textContent = '{% if _ %}{{ _("Table Location") }}{% else %}Table Location{% endif %}';
+            departureInput.placeholder = '{% if _ %}{{ _("Restaurant address") }}{% else %}Restaurant address{% endif %}';
+            arrivalInput.placeholder = '{% if _ %}{{ _("Table or seating area") }}{% else %}Table or seating area{% endif %}';
+            break;
+        case 'activity':
+            departureLabel.textContent = '{% if _ %}{{ _("Meeting Point") }}{% else %}Meeting Point{% endif %}';
+            arrivalLabel.textContent = '{% if _ %}{{ _("Activity Location") }}{% else %}Activity Location{% endif %}';
+            departureInput.placeholder = '{% if _ %}{{ _("Where to meet") }}{% else %}Where to meet{% endif %}';
+            arrivalInput.placeholder = '{% if _ %}{{ _("Activity venue or location") }}{% else %}Activity venue or location{% endif %}';
+            break;
+        default:
+            departureLabel.textContent = '{% if _ %}{{ _("From Location") }}{% else %}From Location{% endif %}';
+            arrivalLabel.textContent = '{% if _ %}{{ _("To Location") }}{% else %}To Location{% endif %}';
+            departureInput.placeholder = '{% if _ %}{{ _("Starting location") }}{% else %}Starting location{% endif %}';
+            arrivalInput.placeholder = '{% if _ %}{{ _("Destination location") }}{% else %}Destination location{% endif %}';
+    }
+}
+
+// Load all bookings
+async function loadBookings() {
+    try {
+        currentBookings = await TripPlanner.api.get('/bookings/');
+        renderBookings(currentBookings);
+    } catch (error) {
+        console.error('Error loading bookings:', error);
+        document.getElementById('bookings-container').innerHTML = `
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle"></i>
+                Failed to load bookings: ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Render bookings
+function renderBookings(bookings) {
+    const container = document.getElementById('bookings-container');
+    
+    if (bookings.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-5">
+                <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                <h5 class="mt-3 text-muted">{% if _ %}{{ _("No bookings yet") }}{% else %}No bookings yet{% endif %}</h5>
+                <p class="text-muted">{% if _ %}{{ _("Start by adding your first booking.") }}{% else %}Start by adding your first booking.{% endif %}</p>
+                <button class="btn btn-primary" onclick="showCreateBookingModal()">
+                    <i class="bi bi-plus-lg"></i> {% if _ %}{{ _("Add First Booking") }}{% else %}Add First Booking{% endif %}
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = bookings.map(booking => createBookingCard(booking)).join('');
+}
+
+// Get location display text based on booking type
+function getLocationDisplay(booking) {
+    let locationParts = [];
+    
+    if (booking.departure_location) {
+        let departureIcon, departureText;
+        
+        switch(booking.booking_type) {
+            case 'accommodation':
+                departureIcon = 'house-door';
+                departureText = booking.departure_location;
+                break;
+            case 'flight':
+                departureIcon = 'airplane-engines';
+                departureText = booking.departure_location;
+                break;
+            case 'car_rental':
+                departureIcon = 'geo-alt';
+                departureText = booking.departure_location;
+                break;
+            case 'restaurant':
+                departureIcon = 'cup-straw';
+                departureText = booking.departure_location;
+                break;
+            case 'activity':
+                departureIcon = 'pin-map';
+                departureText = booking.departure_location;
+                break;
+            default:
+                departureIcon = 'geo-alt';
+                departureText = booking.departure_location;
+        }
+        
+        locationParts.push(`<span class="me-2"><i class="bi bi-${departureIcon}"></i> ${departureText}</span>`);
+    }
+    
+    if (booking.arrival_location && booking.departure_location !== booking.arrival_location) {
+        let arrivalIcon, arrivalText;
+        
+        switch(booking.booking_type) {
+            case 'accommodation':
+                arrivalIcon = 'door-open';
+                arrivalText = booking.arrival_location;
+                break;
+            case 'flight':
+                arrivalIcon = 'airplane-engines-fill';
+                arrivalText = booking.arrival_location;
+                break;
+            case 'car_rental':
+                arrivalIcon = 'geo-alt-fill';
+                arrivalText = booking.arrival_location;
+                break;
+            case 'restaurant':
+                arrivalIcon = 'cup-straw';
+                arrivalText = booking.arrival_location;
+                break;
+            case 'activity':
+                arrivalIcon = 'calendar-event';
+                arrivalText = booking.arrival_location;
+                break;
+            default:
+                arrivalIcon = 'geo-alt-fill';
+                arrivalText = booking.arrival_location;
+        }
+        
+        locationParts.push(`<span class="me-2"><i class="bi bi-arrow-right"></i> <i class="bi bi-${arrivalIcon}"></i> ${arrivalText}</span>`);
+    }
+    
+    return locationParts.join('');
+}
+
+// Create booking card HTML
+function createBookingCard(booking) {
+    const statusClass = {
+        'pending': 'warning',
+        'confirmed': 'success',
+        'cancelled': 'danger'
+    }[booking.status] || 'secondary';
+    
+    const typeIcon = {
+        'flight': 'airplane',
+        'accommodation': 'house',
+        'car_rental': 'car-front',
+        'restaurant': 'cup-straw',
+        'activity': 'calendar-event',
+        'other': 'bookmark'
+    }[booking.booking_type] || 'bookmark';
+    
+    const trip = currentTrips.find(t => t.id === booking.trip_id);
+    const tripName = trip ? trip.name : 'Unknown Trip';
+    
+    const startDate = booking.start_date ? new Date(booking.start_date).toLocaleDateString() : 'Not set';
+    const price = booking.price ? `${booking.currency || 'USD'} ${booking.price.toFixed(2)}` : 'Not set';
+    
+    const locationDisplay = getLocationDisplay(booking);
+    
+    return `
+        <div class="booking-item mb-3 p-3 border rounded" data-booking-id="${booking.id}">
+            <div class="row align-items-center">
+                <div class="col-md-1 text-center">
+                    <i class="bi bi-${typeIcon} fs-2 text-primary"></i>
+                </div>
+                <div class="col-md-5">
+                    <h6 class="mb-1">${booking.title}</h6>
+                    <div class="text-muted small">
+                        <span class="badge bg-primary me-2">
+                            <i class="bi bi-map"></i> ${tripName}
+                        </span>
+                        <span class="badge bg-${statusClass} me-2">${booking.status}</span>
+                        <span class="me-2"><i class="bi bi-calendar"></i> ${startDate}</span>
+                        ${locationDisplay}
+                        ${booking.confirmation_number ? `<span><i class="bi bi-hash"></i> ${booking.confirmation_number}</span>` : ''}
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="fw-bold">${price}</div>
+                    <small class="text-muted text-capitalize">${booking.booking_type.replace('_', ' ')}</small>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editBooking('${booking.id}')" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-success me-1" onclick="viewTripBookings('${booking.trip_id}')" title="View Trip">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteBooking('${booking.id}')" title="Delete">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            </div>
+            ${booking.notes ? `<div class="row mt-2"><div class="col-md-11 offset-md-1"><small class="text-muted"><i class="bi bi-chat-text"></i> ${booking.notes}</small></div></div>` : ''}
+        </div>
+    `;
+}
+
+// Filter bookings
+function filterBookings() {
+    const search = document.getElementById('searchInput').value.toLowerCase();
+    const typeFilter = document.getElementById('filterType').value;
+    const statusFilter = document.getElementById('filterStatus').value;
+    
+    let filtered = currentBookings.filter(booking => {
+        const trip = currentTrips.find(t => t.id === booking.trip_id);
+        const tripName = trip ? trip.name.toLowerCase() : '';
+        
+        const matchesSearch = !search || 
+            booking.title.toLowerCase().includes(search) ||
+            tripName.includes(search) ||
+            (booking.departure_location && booking.departure_location.toLowerCase().includes(search)) ||
+            (booking.arrival_location && booking.arrival_location.toLowerCase().includes(search)) ||
+            (booking.confirmation_number && booking.confirmation_number.toLowerCase().includes(search));
+        
+        const matchesType = !typeFilter || booking.booking_type === typeFilter;
+        const matchesStatus = !statusFilter || booking.status === statusFilter;
+        
+        return matchesSearch && matchesType && matchesStatus;
+    });
+    
+    renderBookings(filtered);
+}
+
+// Clear filters
+function clearFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('filterType').value = '';
+    document.getElementById('filterStatus').value = '';
+    renderBookings(currentBookings);
+}
+
+// Show create booking modal
+function showCreateBookingModal() {
+    editingBookingId = null;
+    document.getElementById('modalTitle').textContent = '{% if _ %}{{ _("Add Booking") }}{% else %}Add Booking{% endif %}';
+    document.getElementById('submitButton').textContent = '{% if _ %}{{ _("Add Booking") }}{% else %}Add Booking{% endif %}';
+    document.getElementById('bookingForm').reset();
+    
+    // Set default values
+    document.getElementById('status').value = 'pending';
+    document.getElementById('currency').value = 'USD';
+    
+    // Reset labels to default
+    updateLocationLabels();
+    
+    const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+    modal.show();
+}
+
+// Edit booking
+async function editBooking(bookingId) {
+    try {
+        const booking = await TripPlanner.api.get(`/bookings/${bookingId}`);
+        
+        editingBookingId = bookingId;
+        document.getElementById('modalTitle').textContent = '{% if _ %}{{ _("Edit Booking") }}{% else %}Edit Booking{% endif %}';
+        document.getElementById('submitButton').textContent = '{% if _ %}{{ _("Update") }}{% else %}Update{% endif %}';
+        
+        // Populate form
+        document.getElementById('title').value = booking.title || '';
+        document.getElementById('booking_type').value = booking.booking_type || 'other';
+        document.getElementById('trip_id').value = booking.trip_id || '';
+        document.getElementById('status').value = booking.status || 'pending';
+        document.getElementById('price').value = booking.price || '';
+        document.getElementById('currency').value = booking.currency || 'USD';
+        document.getElementById('departure_location').value = booking.departure_location || '';
+        document.getElementById('arrival_location').value = booking.arrival_location || '';
+        document.getElementById('confirmation_number').value = booking.confirmation_number || '';
+        document.getElementById('notes').value = booking.notes || '';
+        
+        // Update labels for the booking type
+        updateLocationLabels();
+        
+        // Handle start_date
+        if (booking.start_date) {
+            const date = new Date(booking.start_date);
+            const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('start_date').value = localDateTime;
+        } else {
+            document.getElementById('start_date').value = '';
+        }
+        
+        // Handle end_date
+        if (booking.end_date) {
+            const date = new Date(booking.end_date);
+            const localDateTime = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('end_date').value = localDateTime;
+        } else {
+            document.getElementById('end_date').value = '';
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+        modal.show();
+        
+    } catch (error) {
+        console.error('Error loading booking for edit:', error);
+        TripPlanner.showAlert('Failed to load booking details: ' + error.message, 'danger');
+    }
+}
+
+// Delete booking
+function deleteBooking(bookingId) {
+    const booking = currentBookings.find(b => b.id === bookingId);
+    const bookingTitle = booking ? booking.title : 'this booking';
+    
+    TripPlanner.confirm(
+        `Are you sure you want to delete "${bookingTitle}"? This action cannot be undone.`,
+        async () => {
+            try {
+                await TripPlanner.api.delete(`/bookings/${bookingId}`);
+                TripPlanner.showAlert('{% if _ %}{{ _("Booking deleted successfully!") }}{% else %}Booking deleted successfully!{% endif %}', 'success');
+                await loadBookings();
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+                TripPlanner.showAlert('Failed to delete booking: ' + error.message, 'danger');
+            }
+        }
+    );
+}
+
+// View trip bookings
+function viewTripBookings(tripId) {
+    window.location.href = `/trips/${tripId}/bookings`;
+}
+
+// Handle form submission
+async function handleFormSubmit(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const bookingData = {};
+    
+    // Build booking data object
+    for (let [key, value] of formData.entries()) {
+        if (value.trim() !== '') {
+            if (key === 'price') {
+                bookingData[key] = parseFloat(value);
+            } else if (key === 'start_date' || key === 'end_date') {
+                bookingData[key] = new Date(value).toISOString();
+            } else {
+                bookingData[key] = value;
+            }
+        }
+    }
+    
+    try {
+        if (editingBookingId) {
+            await TripPlanner.api.put(`/bookings/${editingBookingId}`, bookingData);
+            TripPlanner.showAlert('{% if _ %}{{ _("Booking updated successfully!") }}{% else %}Booking updated successfully!{% endif %}', 'success');
+        } else {
+            await TripPlanner.api.post('/bookings/', bookingData);
+            TripPlanner.showAlert('{% if _ %}{{ _("Booking created successfully!") }}{% else %}Booking created successfully!{% endif %}', 'success');
+        }
+        
+        // Close modal and reload
+        const modal = bootstrap.Modal.getInstance(document.getElementById('bookingModal'));
+        modal.hide();
+        await loadBookings();
+        
+    } catch (error) {
+        console.error('Error saving booking:', error);
+        TripPlanner.showAlert('Failed to save booking: ' + error.message, 'danger');
+    }
+}
+</script>
+{% endblock %} 

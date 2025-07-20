@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  trip-planner:
+    build: .
+    container_name: trip-planner-app
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app    # Mount source for development (optional)
+    environment:
+      - ENVIRONMENT=production
+      - DATABASE_URL=cockroachdb://root@cockroachdb:26257/trip_planner?sslmode=disable
+      - DB_DEBUG=false
+    depends_on:
+      cockroach-init:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.trip-planner.rule=Host(`trip-planner.localhost`)"
+      - "traefik.http.routers.trip-planner.entrypoints=web"
+      - "traefik.http.services.trip-planner.loadbalancer.server.port=8000"
+
+  # Test runner service
+  trip-planner-test:
+    build: .
+    container_name: trip-planner-test
+    environment:
+      - TESTING=true
+      - DATABASE_URL=postgresql://test_user:test_pass@postgres-test:5432/trip_planner_test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    command: python -m pytest -v
+    profiles: ["test"]
+
+  # PostgreSQL test database
+  postgres-test:
+    image: postgres:15-alpine
+    container_name: trip-planner-postgres-test
+    environment:
+      - POSTGRES_DB=trip_planner_test
+      - POSTGRES_USER=test_user
+      - POSTGRES_PASSWORD=test_pass
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test_user -d trip_planner_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    profiles: ["test"]
+
+  # Optional: Add a reverse proxy
+  traefik:
+    image: traefik:v2.10
+    container_name: trip-planner-traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+
+  # CockroachDB Database
+  cockroachdb:
+    image: cockroachdb/cockroach:v23.1.14
+    container_name: trip-planner-cockroachdb
+    command: start-single-node --insecure --store=attrs=ssd,path=/cockroach/cockroach-data --http-addr=0.0.0.0:8080
+    volumes:
+      - cockroach_data:/cockroach/cockroach-data
+    ports:
+      - "26257:26257"  # SQL port
+      - "8081:8080"    # Admin UI port (changed to avoid conflict with Traefik)
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health?ready=1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    
+  # Database initialization service
+  cockroach-init:
+    image: cockroachdb/cockroach:v23.1.14
+    container_name: trip-planner-cockroach-init
+    command: sql --insecure --host=cockroachdb --execute="CREATE DATABASE IF NOT EXISTS trip_planner;"
+    depends_on:
+      cockroachdb:
+        condition: service_healthy
+    restart: "no"
+
+  # Optional: Redis for caching and sessions
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: trip-planner-redis
+  #   restart: unless-stopped
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+
+volumes:
+  cockroach_data:  # CockroachDB data volume
+
+networks:
+  default:
+    name: trip-planner-network

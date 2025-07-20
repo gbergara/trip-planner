@@ -1,0 +1,220 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Trip Planner 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Dashboard and navigation
+msgid "Dashboard"
+msgstr ""
+
+msgid "My Trips"
+msgstr ""
+
+msgid "All Bookings"
+msgstr ""
+
+msgid "Settings"
+msgstr ""
+
+msgid "Trip Planning Made Easy"
+msgstr ""
+
+msgid "Language"
+msgstr ""
+
+# Trip management
+msgid "Trips"
+msgstr ""
+
+msgid "Add Trip"
+msgstr ""
+
+msgid "Edit Trip"
+msgstr ""
+
+msgid "Delete Trip"
+msgstr ""
+
+msgid "Trip Name"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Start Date"
+msgstr ""
+
+msgid "End Date"
+msgstr ""
+
+msgid "Primary Destination"
+msgstr ""
+
+msgid "Budget"
+msgstr ""
+
+msgid "Currency"
+msgstr ""
+
+msgid "Traveler Count"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+# Booking management
+msgid "Bookings"
+msgstr ""
+
+msgid "Add Booking"
+msgstr ""
+
+msgid "Edit Booking"
+msgstr ""
+
+msgid "Delete Booking"
+msgstr ""
+
+msgid "Booking Title"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
+msgid "Flight"
+msgstr ""
+
+msgid "Accommodation"
+msgstr ""
+
+msgid "Transport"
+msgstr ""
+
+msgid "Activity"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Departure Location"
+msgstr ""
+
+msgid "Arrival Location"
+msgstr ""
+
+msgid "Confirmation Number"
+msgstr ""
+
+msgid "Price"
+msgstr ""
+
+# Status values
+msgid "Planning"
+msgstr ""
+
+msgid "Confirmed"
+msgstr ""
+
+msgid "Completed"
+msgstr ""
+
+msgid "Cancelled"
+msgstr ""
+
+msgid "Pending"
+msgstr ""
+
+# Actions
+msgid "Save"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Update"
+msgstr ""
+
+msgid "Create"
+msgstr ""
+
+msgid "View"
+msgstr ""
+
+msgid "Export to PDF"
+msgstr ""
+
+msgid "Back to Trips"
+msgstr ""
+
+# Statistics
+msgid "Total Bookings"
+msgstr ""
+
+msgid "Total Cost"
+msgstr ""
+
+msgid "Recent Trips"
+msgstr ""
+
+# Search and filters
+msgid "Search bookings..."
+msgstr ""
+
+msgid "All Types"
+msgstr ""
+
+msgid "All Statuses"
+msgstr ""
+
+# Messages
+msgid "Trip created successfully!"
+msgstr ""
+
+msgid "Trip updated successfully!"
+msgstr ""
+
+msgid "Trip deleted successfully!"
+msgstr ""
+
+msgid "Booking created successfully!"
+msgstr ""
+
+msgid "Booking updated successfully!"
+msgstr ""
+
+msgid "Booking deleted successfully!"
+msgstr ""
+
+msgid "PDF exported successfully!"
+msgstr ""
+
+msgid "Failed to load trip details"
+msgstr ""
+
+msgid "Trip not found"
+msgstr ""
+
+msgid "No bookings yet"
+msgstr ""
+
+msgid "Start by adding your first booking for this trip."
+msgstr ""
+
+msgid "Add First Booking"
+msgstr "" 

@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Database
+*.db
+*.sqlite3
+data/
+
+# Logs
+*.log
+logs/
+
+# Node modules (if any)
+node_modules/
+
+# Documentation
+README.md
+docs/
+
+# Scripts
+scripts/
+backups/
+
+# Test files
+# tests/  # Need tests for running unit tests
+*_test.py
+test_*.py
+
+# Coverage
+.coverage
+htmlcov/
+
+# MyPy
+.mypy_cache/
+
+# Pytest
+.pytest_cache/ 

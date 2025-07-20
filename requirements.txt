@@ -1,0 +1,24 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+pydantic==2.5.1
+jinja2==3.1.2
+python-multipart==0.0.6
+aiofiles==23.2.0
+requests==2.31.0
+psycopg2-binary==2.9.9
+sqlalchemy-cockroachdb==2.0.2
+babel==2.13.1
+weasyprint==60.2
+reportlab==4.0.7
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx==0.24.1
+pytest-mock>=3.11.0
+
+# Authentication & OAuth2 dependencies
+authlib==1.2.1
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+itsdangerous==2.1.2
+starlette==0.27.0

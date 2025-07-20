@@ -1,0 +1,388 @@
+# English translations for Trip Planner
+# Copyright (C) 2024
+# This file is distributed under the same license as the Trip Planner package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Trip Planner 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-01-01 12:00+0000\n"
+"PO-Revision-Date: 2025-01-01 12:00+0000\n"
+"Last-Translator: Auto <auto@example.com>\n"
+"Language: en\n"
+"Language-Team: English\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Dashboard and navigation
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "Trip Planner"
+msgstr "Trip Planner"
+
+msgid "My Trips"
+msgstr "My Trips"
+
+msgid "All Bookings"
+msgstr "All Bookings"
+
+msgid "Settings"
+msgstr "Settings"
+
+msgid "Trip Planning Made Easy"
+msgstr "Trip Planning Made Easy"
+
+msgid "Language"
+msgstr "Language"
+
+# Trip management
+msgid "Trips"
+msgstr "Trips"
+
+msgid "Add Trip"
+msgstr "Add Trip"
+
+msgid "Edit Trip"
+msgstr "Edit Trip"
+
+msgid "Delete Trip"
+msgstr "Delete Trip"
+
+msgid "Trip Name"
+msgstr "Trip Name"
+
+msgid "Description"
+msgstr "Description"
+
+msgid "Start Date"
+msgstr "Start Date"
+
+msgid "End Date"
+msgstr "End Date"
+
+msgid "Primary Destination"
+msgstr "Primary Destination"
+
+msgid "Budget"
+msgstr "Budget"
+
+msgid "Currency"
+msgstr "Currency"
+
+msgid "Traveler Count"
+msgstr "Traveler Count"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Notes"
+msgstr "Notes"
+
+# Booking management
+msgid "Bookings"
+msgstr "Bookings"
+
+msgid "Add Booking"
+msgstr "Add Booking"
+
+msgid "Edit Booking"
+msgstr "Edit Booking"
+
+msgid "Delete Booking"
+msgstr "Delete Booking"
+
+msgid "Booking Title"
+msgstr "Booking Title"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Flight"
+msgstr "Flight"
+
+msgid "Accommodation"
+msgstr "Accommodation"
+
+msgid "Car Rental"
+msgstr "Car Rental"
+
+msgid "Restaurant"
+msgstr "Restaurant"
+
+msgid "Restaurant Address"
+msgstr "Restaurant Address"
+
+msgid "Table Location"
+msgstr "Table Location"
+
+msgid "Restaurant address"
+msgstr "Restaurant address"
+
+msgid "Table or seating area"
+msgstr "Table or seating area"
+
+msgid "Activity"
+msgstr "Activity"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Departure Location"
+msgstr "Departure Location"
+
+msgid "Arrival Location"
+msgstr "Arrival Location"
+
+msgid "Confirmation Number"
+msgstr "Confirmation Number"
+
+msgid "Price"
+msgstr "Price"
+
+# Status values
+msgid "Planning"
+msgstr "Planning"
+
+msgid "Confirmed"
+msgstr "Confirmed"
+
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Cancelled"
+msgstr "Cancelled"
+
+msgid "Pending"
+msgstr "Pending"
+
+# Actions
+msgid "Save"
+msgstr "Save"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "Update"
+msgstr "Update"
+
+msgid "Create"
+msgstr "Create"
+
+msgid "View"
+msgstr "View"
+
+msgid "Export to PDF"
+msgstr "Export to PDF"
+
+msgid "Back to Trips"
+msgstr "Back to Trips"
+
+# Statistics
+msgid "Total Bookings"
+msgstr "Total Bookings"
+
+msgid "Total Cost"
+msgstr "Total Cost"
+
+msgid "Recent Trips"
+msgstr "Recent Trips"
+
+# Search and filters
+msgid "Search bookings..."
+msgstr "Search bookings..."
+
+msgid "All Types"
+msgstr "All Types"
+
+msgid "All Statuses"
+msgstr "All Statuses"
+
+# Messages
+msgid "Trip created successfully!"
+msgstr "Trip created successfully!"
+
+msgid "Trip updated successfully!"
+msgstr "Trip updated successfully!"
+
+msgid "Trip deleted successfully!"
+msgstr "Trip deleted successfully!"
+
+msgid "Booking created successfully!"
+msgstr "Booking created successfully!"
+
+msgid "Booking updated successfully!"
+msgstr "Booking updated successfully!"
+
+msgid "Booking deleted successfully!"
+msgstr "Booking deleted successfully!"
+
+msgid "PDF exported successfully!"
+msgstr "PDF exported successfully!"
+
+msgid "Failed to load trip details"
+msgstr "Failed to load trip details"
+
+msgid "Trip not found"
+msgstr "Trip not found"
+
+msgid "No bookings yet"
+msgstr "No bookings yet"
+
+msgid "Start by adding your first booking for this trip."
+msgstr "Start by adding your first booking for this trip."
+
+msgid "Add First Booking"
+msgstr "Add First Booking"
+
+msgid "Loading bookings..."
+msgstr "Loading bookings..."
+
+msgid "Select Trip"
+msgstr "Select Trip"
+
+msgid "Trip"
+msgstr "Trip"
+
+msgid "Start by adding your first booking."
+msgstr "Start by adding your first booking."
+
+msgid "Unknown Trip"
+msgstr "Unknown Trip"
+
+msgid "Address"
+msgstr "Address"
+
+msgid "Check-in Location"
+msgstr "Check-in Location"
+
+msgid "Hotel address or location"
+msgstr "Hotel address or location"
+
+msgid "Specific check-in location"
+msgstr "Specific check-in location"
+
+msgid "Departure Airport"
+msgstr "Departure Airport"
+
+msgid "Arrival Airport"
+msgstr "Arrival Airport"
+
+msgid "Departure airport code or name"
+msgstr "Departure airport code or name"
+
+msgid "Arrival airport code or name"
+msgstr "Arrival airport code or name"
+
+msgid "Pick-up Location"
+msgstr "Pick-up Location"
+
+msgid "Drop-off Location"
+msgstr "Drop-off Location"
+
+msgid "Where to pick up"
+msgstr "Where to pick up"
+
+msgid "Where to drop off"
+msgstr "Where to drop off"
+
+msgid "Meeting Point"
+msgstr "Meeting Point"
+
+msgid "Activity Location"
+msgstr "Activity Location"
+
+msgid "Where to meet"
+msgstr "Where to meet"
+
+msgid "Activity venue or location"
+msgstr "Activity venue or location"
+
+msgid "From Location"
+msgstr "From Location"
+
+msgid "To Location"
+msgstr "To Location"
+
+msgid "Starting location"
+msgstr "Starting location"
+
+msgid "Destination location"
+msgstr "Destination location"
+
+# Authentication
+msgid "Login"
+msgstr "Login"
+
+msgid "Sign In"
+msgstr "Sign In"
+
+msgid "Sign Out"
+msgstr "Sign Out"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Welcome back! Sign in to continue planning your trips."
+msgstr "Welcome back! Sign in to continue planning your trips."
+
+msgid "Continue with Google"
+msgstr "Continue with Google"
+
+msgid "Continue as Guest"
+msgstr "Continue as Guest"
+
+msgid "Start Using Trip Planner"
+msgstr "Start Using Trip Planner"
+
+msgid "or"
+msgstr "or"
+
+msgid "Guest User"
+msgstr "Guest User"
+
+msgid "You're browsing as a guest"
+msgstr "You're browsing as a guest"
+
+msgid "Sign In with Google"
+msgstr "Sign In with Google"
+
+msgid "About Guest Mode"
+msgstr "About Guest Mode"
+
+msgid "Google Authentication is not configured. You can still use the app as a guest!"
+msgstr "Google Authentication is not configured. You can still use the app as a guest!"
+
+# Guest mode information
+msgid "Guest Mode Info"
+msgstr "Guest Mode Info"
+
+msgid "Your trips are saved for 30 days in your browser"
+msgstr "Your trips are saved for 30 days in your browser"
+
+msgid "Data is not synced across devices"
+msgstr "Data is not synced across devices"
+
+msgid "Sign in with Google to save permanently and sync across devices"
+msgstr "Sign in with Google to save permanently and sync across devices"
+
+msgid "Guest trips can be converted to your account after signing in"
+msgstr "Guest trips can be converted to your account after signing in"
+
+# Authentication status
+msgid "Not authenticated"
+msgstr "Not authenticated"
+
+msgid "Successfully logged out"
+msgstr "Successfully logged out"
+
+msgid "Authentication failed"
+msgstr "Authentication failed"
+
+msgid "Invalid authentication credentials"
+msgstr "Invalid authentication credentials"
+
+msgid "Session expired"
+msgstr "Session expired" 

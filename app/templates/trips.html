@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}{% if _ %}{{ _("My Trips") }}{% else %}My Trips{% endif %} - Trip Planner{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">
+        <i class="bi bi-map me-2"></i>
+        {% if _ %}{{ _("My Trips") }}{% else %}My Trips{% endif %}
+    </h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tripModal" onclick="resetTripForm()">
+        <i class="bi bi-plus-circle me-2"></i>
+        {% if _ %}{{ _("Add Trip") }}{% else %}New Trip{% endif %}
+    </button>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label for="filterStatus" class="form-label">{% if _ %}{{ _("Status") }}{% else %}Status{% endif %}</label>
+                <select id="filterStatus" class="form-select">
+                    <option value="">{% if _ %}{{ _("All Statuses") }}{% else %}All Status{% endif %}</option>
+                    <option value="planning">{% if _ %}{{ _("Planning") }}{% else %}Planning{% endif %}</option>
+                    <option value="confirmed">{% if _ %}{{ _("Confirmed") }}{% else %}Confirmed{% endif %}</option>
+                    <option value="in_progress">{% if _ %}{{ _("In Progress") }}{% else %}In Progress{% endif %}</option>
+                    <option value="completed">{% if _ %}{{ _("Completed") }}{% else %}Completed{% endif %}</option>
+                    <option value="cancelled">{% if _ %}{{ _("Cancelled") }}{% else %}Cancelled{% endif %}</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="searchInput" class="form-label">{% if _ %}{{ _("Search") }}{% else %}Search{% endif %}</label>
+                <input type="text" id="searchInput" class="form-control" placeholder="{% if _ %}{{ _('Search trips...') }}{% else %}Search trips...{% endif %}">
+            </div>
+            <div class="col-md-3">
+                <label for="sortBy" class="form-label">{% if _ %}{{ _("Sort By") }}{% else %}Sort By{% endif %}</label>
+                <select id="sortBy" class="form-select">
+                    <option value="created_at">{% if _ %}{{ _("Created Date") }}{% else %}Created Date{% endif %}</option>
+                    <option value="start_date">{% if _ %}{{ _("Start Date") }}{% else %}Start Date{% endif %}</option>
+                    <option value="name">{% if _ %}{{ _("Trip Name") }}{% else %}Name{% endif %}</option>
+                    <option value="status">{% if _ %}{{ _("Status") }}{% else %}Status{% endif %}</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn btn-outline-secondary d-block" onclick="clearFilters()">{% if _ %}{{ _("Clear Filters") }}{% else %}Clear Filters{% endif %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trips List -->
+<div class="card">
+    <div class="card-body">
+        <div id="trips-container">
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trip Modal -->
+<div class="modal fade" id="tripModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="tripForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">{% if _ %}{{ _("Add Trip") }}{% else %}New Trip{% endif %}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <!-- Basic Information -->
+                        <div class="col-md-8">
+                            <label for="name" class="form-label">{% if _ %}{{ _("Trip Name") }}{% else %}Trip Name{% endif %} *</label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="{% if _ %}{{ _('e.g., Summer Vacation to Europe') }}{% else %}e.g., Summer Vacation to Europe{% endif %}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="status" class="form-label">{% if _ %}{{ _("Status") }}{% else %}Status{% endif %}</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="planning">{% if _ %}{{ _("Planning") }}{% else %}Planning{% endif %}</option>
+                                <option value="confirmed">{% if _ %}{{ _("Confirmed") }}{% else %}Confirmed{% endif %}</option>
+                                <option value="in_progress">{% if _ %}{{ _("In Progress") }}{% else %}In Progress{% endif %}</option>
+                                <option value="completed">{% if _ %}{{ _("Completed") }}{% else %}Completed{% endif %}</option>
+                                <option value="cancelled">{% if _ %}{{ _("Cancelled") }}{% else %}Cancelled{% endif %}</option>
+                            </select>
+                        </div>
+
+                        <!-- Dates -->
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">{% if _ %}{{ _("Start Date") }}{% else %}Start Date{% endif %} *</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">{% if _ %}{{ _("End Date") }}{% else %}End Date{% endif %} *</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" required>
+                        </div>
+
+                        <!-- Destinations -->
+                        <div class="col-md-6">
+                            <label for="primary_destination" class="form-label">{% if _ %}{{ _("Primary Destination") }}{% else %}Primary Destination{% endif %}</label>
+                            <input type="text" class="form-control" id="primary_destination" name="primary_destination" placeholder="{% if _ %}{{ _('e.g., Paris, France') }}{% else %}e.g., Paris, France{% endif %}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="traveler_count" class="form-label">{% if _ %}{{ _("Traveler Count") }}{% else %}Number of Travelers{% endif %}</label>
+                            <input type="number" class="form-control" id="traveler_count" name="traveler_count" min="1" value="1">
+                        </div>
+
+                        <!-- Budget -->
+                        <div class="col-md-8">
+                            <label for="budget" class="form-label">{% if _ %}{{ _("Budget") }}{% else %}Budget{% endif %}</label>
+                            <input type="number" step="0.01" class="form-control" id="budget" name="budget" placeholder="{% if _ %}{{ _('Total budget for the trip') }}{% else %}Total budget for the trip{% endif %}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="currency" class="form-label">{% if _ %}{{ _("Currency") }}{% else %}Currency{% endif %}</label>
+                            <select class="form-select" id="currency" name="currency">
+                                <option value="USD">USD</option>
+                                <option value="EUR">EUR</option>
+                                <option value="GBP">GBP</option>
+                                <option value="CAD">CAD</option>
+                                <option value="AUD">AUD</option>
+                                <option value="JPY">JPY</option>
+                            </select>
+                        </div>
+
+                        <!-- Description & Notes -->
+                        <div class="col-12">
+                            <label for="description" class="form-label">{% if _ %}{{ _("Description") }}{% else %}Description{% endif %}</label>
+                            <textarea class="form-control" id="description" name="description" rows="2" placeholder="{% if _ %}{{ _('Brief description of the trip') }}{% else %}Brief description of the trip{% endif %}"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label for="destinations" class="form-label">{% if _ %}{{ _("Destinations List") }}{% else %}Destinations List{% endif %}</label>
+                            <textarea class="form-control" id="destinations" name="destinations" rows="2" placeholder="{% if _ %}{{ _('List of all destinations (one per line)') }}{% else %}List of all destinations (one per line){% endif %}"></textarea>
+                            <div class="form-text">{% if _ %}{{ _("Enter each destination on a separate line") }}{% else %}Enter each destination on a separate line{% endif %}</div>
+                        </div>
+                        <div class="col-12">
+                            <label for="notes" class="form-label">{% if _ %}{{ _("Notes") }}{% else %}Notes{% endif %}</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="{% if _ %}{{ _('Any additional notes or reminders') }}{% else %}Any additional notes or reminders{% endif %}"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% if _ %}{{ _("Cancel") }}{% else %}Cancel{% endif %}</button>
+                    <button type="submit" class="btn btn-primary" id="submitButton">{% if _ %}{{ _("Create Trip") }}{% else %}Create Trip{% endif %}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', path='/js/trips.js') }}"></script>
+{% endblock %} 

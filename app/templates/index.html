@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+
+{% block title %}{% if _ %}{{ _("Dashboard") }}{% else %}Dashboard{% endif %} - Trip Planner{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">
+                <i class="bi bi-speedometer2 me-2"></i>
+                {% if _ %}{{ _("Dashboard") }}{% else %}Dashboard{% endif %}
+            </h1>
+            <a href="/trips" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>
+                {% if _ %}{{ _("Add Trip") }}{% else %}New Trip{% endif %}
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-map fs-2 me-3"></i>
+                            <div>
+                                <h5 class="card-title mb-1">{% if _ %}{{ _("Total Trips") }}{% else %}Total Trips{% endif %}</h5>
+                                <p class="card-text fs-4 mb-0" id="total-trips">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-bg-success">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-check-circle fs-2 me-3"></i>
+                            <div>
+                                <h5 class="card-title mb-1">{% if _ %}{{ _("Confirmed") }}{% else %}Confirmed{% endif %}</h5>
+                                <p class="card-text fs-4 mb-0" id="confirmed-trips">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-clock fs-2 me-3"></i>
+                            <div>
+                                <h5 class="card-title mb-1">{% if _ %}{{ _("Planning") }}{% else %}Planning{% endif %}</h5>
+                                <p class="card-text fs-4 mb-0" id="planning-trips">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-bg-info">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-airplane fs-2 me-3"></i>
+                            <div>
+                                <h5 class="card-title mb-1">{% if _ %}{{ _("In Progress") }}{% else %}In Progress{% endif %}</h5>
+                                <p class="card-text fs-4 mb-0" id="active-trips">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Trips -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-clock-history me-2"></i>
+                    {% if _ %}{{ _("Recent Trips") }}{% else %}Recent Trips{% endif %}
+                </h5>
+                <a href="/trips" class="btn btn-sm btn-outline-primary">{% if _ %}{{ _("View All") }}{% else %}View All{% endif %}</a>
+            </div>
+            <div class="card-body">
+                <div id="recent-trips">
+                    {% if recent_trips %}
+                        {% for trip in recent_trips %}
+                        <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
+                            <div class="d-flex align-items-center">
+                                <div class="trip-icon me-3">
+                                    <i class="bi bi-map text-primary fs-4"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">
+                                        <a href="/trips/{{ trip.id }}/bookings" class="text-decoration-none text-primary fw-bold">{{ trip.name }}</a>
+                                        <button class="btn btn-sm btn-outline-primary ms-2" onclick="viewTripDetails('{{ trip.id|string }}')" title="View Details">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-secondary ms-1" onclick="editTripFromDashboard('{{ trip.id|string }}')" title="Edit Trip">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                    </h6>
+                                    <small class="text-muted">
+                                        {{ trip.start_date.strftime('%B %d, %Y') }} - {{ trip.end_date.strftime('%B %d, %Y') }}
+                                        {% if trip.primary_destination %}
+                                            • {{ trip.primary_destination }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-{{ 'success' if trip.status.value == 'confirmed' else 'info' if trip.status.value == 'in_progress' else 'warning' if trip.status.value == 'planning' else 'secondary' }}">
+                                    {{ trip.status.value.replace('_', ' ').title() }}
+                                </span>
+                                {% if trip.budget %}
+                                    <div class="small text-muted mt-1">Budget: {{ trip.currency }} {{ "{:,.2f}".format(trip.budget) }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-map fs-1 mb-3"></i>
+                            <p>No trips yet. <a href="/trips">Plan your first trip!</a></p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    {% if _ %}{{ _("Quick Actions") }}{% else %}Quick Actions{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="showTripModal()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        {% if _ %}{{ _("Add Trip") }}{% else %}New Trip{% endif %}
+                    </button>
+                    <button class="btn btn-outline-success" onclick="viewTrips()">
+                        <i class="bi bi-map me-2"></i>
+                        {% if _ %}{{ _("View All Trips") }}{% else %}View All Trips{% endif %}
+                    </button>
+                    <button class="btn btn-outline-info" onclick="viewBookings()">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        {% if _ %}{{ _("All Bookings") }}{% else %}All Bookings{% endif %}
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="tripStatistics()">
+                        <i class="bi bi-graph-up me-2"></i>
+                        {% if _ %}{{ _("Trip Statistics") }}{% else %}Trip Statistics{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    {% if _ %}{{ _("About") }}{% else %}About{% endif %}
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted">
+                    Trip Planner helps you organize all your travel bookings in one place. 
+                    Manage flights, accommodations, car rentals, and activities with ease.
+                </p>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-shield-check me-1"></i>
+                    All your data is stored securely.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Load trip stats on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadTripStats();
+});
+
+async function loadTripStats() {
+    try {
+        const response = await fetch('/api/trips/');
+        const trips = await response.json();
+        
+        const stats = {
+            total: trips.length,
+            planning: 0,
+            confirmed: 0,
+            in_progress: 0,
+            completed: 0,
+            cancelled: 0
+        };
+        
+        trips.forEach(trip => {
+            if (stats.hasOwnProperty(trip.status)) {
+                stats[trip.status]++;
+            }
+        });
+        
+        document.getElementById('total-trips').textContent = stats.total;
+        document.getElementById('confirmed-trips').textContent = stats.confirmed;
+        document.getElementById('planning-trips').textContent = stats.planning;
+        document.getElementById('active-trips').textContent = stats.in_progress;
+    } catch (error) {
+        console.error('Error loading trip stats:', error);
+    }
+}
+
+function showTripModal() {
+    // Redirect to trips page to create new trip
+    window.location.href = '/trips?action=new';
+}
+
+function viewTrips() {
+    window.location.href = '/trips';
+}
+
+function viewBookings() {
+    window.location.href = '/bookings';
+}
+
+function tripStatistics() {
+    // TODO: Show detailed statistics modal
+    alert('Trip statistics feature coming soon!');
+}
+
+function viewTripDetails(tripId) {
+    window.location.href = `/trips?highlight=${tripId}`;
+}
+
+function editTripFromDashboard(tripId) {
+    // Ensure tripId is treated as string and store it
+    const tripIdStr = String(tripId);
+    sessionStorage.setItem('editTripId', tripIdStr);
+    window.location.href = '/trips?action=edit&id=' + tripIdStr;
+}
+</script>
+{% endblock %} 

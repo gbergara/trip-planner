@@ -1,0 +1,234 @@
+/* Custom styles for Trip Planner */
+
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.booking-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.booking-item {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: white;
+    transition: all 0.15s ease-in-out;
+}
+
+.booking-item:hover {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.booking-type-flight {
+    border-left: 4px solid #0d6efd;
+}
+
+.booking-type-accommodation {
+    border-left: 4px solid #198754;
+}
+
+.booking-type-car_rental {
+    border-left: 4px solid #ffc107;
+}
+
+.booking-type-activity {
+    border-left: 4px solid #0dcaf0;
+}
+
+.booking-type-restaurant {
+    border-left: 4px solid #fd7e14;
+}
+
+.booking-type-other {
+    border-left: 4px solid #6c757d;
+}
+
+.btn-action {
+    border: none;
+    background: none;
+    color: #6c757d;
+    padding: 0.25rem 0.5rem;
+    margin: 0 0.125rem;
+    border-radius: 0.25rem;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-action:hover {
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.btn-action.btn-edit:hover {
+    color: #0d6efd;
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+.btn-action.btn-delete:hover {
+    color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.status-badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+}
+
+.status-confirmed {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.status-pending {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+}
+
+.status-cancelled {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+}
+
+.modal-lg {
+    max-width: 900px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.date-display {
+    font-weight: 500;
+    color: #495057;
+}
+
+.price-display {
+    font-weight: 600;
+    color: #198754;
+}
+
+.booking-details {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.empty-state {
+    padding: 3rem 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.filter-section {
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .booking-item {
+        padding: 0.75rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .modal-lg {
+        max-width: 95%;
+        margin: 0.5rem auto;
+    }
+    
+    .btn-action {
+        padding: 0.375rem 0.5rem;
+    }
+}
+
+/* Loading spinner animation */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s infinite;
+}
+
+/* Success/error messages */
+.alert-floating {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease-in-out;
+}
+
+.alert-floating.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .card {
+        background-color: #343a40;
+        color: white;
+    }
+    
+    .booking-item {
+        background-color: #495057;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    .form-control,
+    .form-select {
+        background-color: #495057;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    .form-control:focus,
+    .form-select:focus {
+        background-color: #495057;
+        border-color: #0d6efd;
+        color: white;
+    }
+} 
