@@ -10,8 +10,10 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 # Import the models so Alembic can detect changes
 from app.core.database import Base
+# Import all models so Alembic can detect schema changes
 from app.models.user import User
 from app.models.booking import Trip, Booking, Todo
+from app.models.allowed_google_account import AllowedGoogleAccount
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

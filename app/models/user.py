@@ -31,7 +31,9 @@ class User(Base):
     # User preferences
     preferred_language = Column(String(10), default="en")
     preferred_currency = Column(String(10), default="USD")
-    
+
+    # Restriction fields
+
     # Account status
     is_active = Column(Boolean, default=True)
     

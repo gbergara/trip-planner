@@ -18,6 +18,7 @@ from fastapi import HTTPException, status
 from ..core.config import DEFAULT_LANGUAGE
 from ..models.user import User
 from ..models import UserCreate, UserResponse, CurrentUser
+from ..models.allowed_google_account import AllowedGoogleAccount
 
 
 class GoogleAuthService:
@@ -25,17 +26,18 @@ class GoogleAuthService:
     
     def __init__(self):
         self.oauth = OAuth()
-        
+
+
         # Get configuration from environment variables
         self.google_client_id = os.getenv("GOOGLE_CLIENT_ID")
         self.google_client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
         self.secret_key = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
         self.algorithm = "HS256"
         self.access_token_expire_minutes = 60 * 24 * 7  # 7 days
-        
+
         # OAuth credentials are optional - app can run in guest-only mode
         self.oauth_enabled = bool(self.google_client_id and self.google_client_secret)
-        
+
         # Configure Google OAuth2 only if credentials are provided
         if self.oauth_enabled:
             self.oauth.register(
@@ -95,19 +97,36 @@ class GoogleAuthService:
             )
     
     def create_or_update_user(self, db: Session, user_info: Dict[str, Any]) -> User:
-        """Create a new user or update an existing user from Google user info."""
+        """Create a new user or update an existing user from Google user info, with allowlist check."""
         google_id = user_info.get('sub')
         email = user_info.get('email')
-        
+        domain = email.split('@')[-1] if email else None
+
         if not google_id or not email:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid user information from Google"
             )
-        
+
         # Check if user already exists
         existing_user = db.query(User).filter(User.google_id == google_id).first()
-        
+
+        # Always check DB-based allowlist for both new and existing users
+        allowed = False
+        if email:
+            try:
+                allowed_email = db.query(AllowedGoogleAccount).filter(AllowedGoogleAccount.email == email, AllowedGoogleAccount.active == True).first()
+                if allowed_email:
+                    allowed = True
+            except Exception:
+                pass
+        if not allowed and domain:
+            allowed_domain = db.query(AllowedGoogleAccount).filter(AllowedGoogleAccount.domain == domain, AllowedGoogleAccount.active == True).first()
+            if allowed_domain:
+                allowed = True
+        if not allowed:
+            raise HTTPException(status_code=403, detail="Email or domain is not allowed to log in.")
+
         if existing_user:
             # Update existing user
             existing_user.email = email
@@ -117,11 +136,10 @@ class GoogleAuthService:
             existing_user.picture = user_info.get('picture')
             existing_user.updated_at = datetime.utcnow()
             existing_user.last_login = datetime.utcnow()
-            
             db.commit()
             db.refresh(existing_user)
             return existing_user
-        
+
         else:
             # Create new user
             user_data = UserCreate(
@@ -133,10 +151,8 @@ class GoogleAuthService:
                 picture=user_info.get('picture'),
                 preferred_language=self.detect_user_language(user_info)
             )
-            
             new_user = User(**user_data.model_dump())
             new_user.last_login = datetime.utcnow()
-            
             db.add(new_user)
             db.commit()
             db.refresh(new_user)
@@ -194,4 +210,4 @@ class GoogleAuthService:
 
 
 # Global instance of the auth service
-auth_service = GoogleAuthService() 
+auth_service = GoogleAuthService()
