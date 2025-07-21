@@ -25,9 +25,11 @@
                     </p>
                 </div>
                 <div>
+                    {% if can_edit %}
                     <button class="btn btn-success" onclick="showCreateBookingModal()">
                         <i class="bi bi-plus-lg"></i> {% if _ %}{{ _("Add Booking") }}{% else %}Add Booking{% endif %}
                     </button>
+                    {% endif %}
                     <button class="btn btn-warning me-2" onclick="exportTripToPDF()">
                         <i class="bi bi-file-earmark-pdf"></i> {% if _ %}{{ _("Export to PDF") }}{% else %}Export to PDF{% endif %}
                     </button>
@@ -110,9 +112,11 @@
             <div class="card h-100">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">{% if _ %}{{ _("TODO List") }}{% else %}TODO List{% endif %}</h5>
+                    {% if can_edit %}
                     <button class="btn btn-sm btn-primary" onclick="showCreateTodoModal()">
                         <i class="bi bi-plus"></i> {% if _ %}{{ _("Add Todo") }}{% else %}Add Todo{% endif %}
                     </button>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <div id="todosContainer">
@@ -704,12 +708,14 @@ function createBookingCard(booking, isGrouped = false) {
                     <small class="text-muted text-capitalize">${booking.booking_type.replace('_', ' ')}</small>
                 </div>
                 <div class="col-md-2 text-end">
+                    {% if can_edit %}
                     <button class="btn btn-sm btn-outline-primary me-1" onclick="editBooking('${booking.id}')" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-sm btn-outline-danger" onclick="deleteBooking('${booking.id}')" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>
+                    {% endif %}
                 </div>
             </div>
             ${booking.notes ? `<div class="row mt-2"><div class="col-md-11 offset-md-1"><small class="text-muted"><i class="bi bi-chat-text"></i> ${booking.notes}</small></div></div>` : ''}
@@ -987,12 +993,14 @@ function displayTodos(todos) {
                     </div>
                 </div>
                 <div class="btn-group btn-group-sm">
+                    {% if can_edit %}
                     <button class="btn btn-outline-primary btn-sm" onclick="editTodo('${todo.id}')" title="Edit">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-outline-danger btn-sm" onclick="deleteTodo('${todo.id}')" title="Delete">
                         <i class="bi bi-trash"></i>
                     </button>
+                    {% endif %}
                 </div>
             </div>
         `;
@@ -1161,4 +1169,4 @@ window.deleteBooking = deleteBooking;
     </div>
 </div>
 
-{% endblock %} 
+{% endblock %}

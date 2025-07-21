@@ -30,7 +30,7 @@ SUPPORTED_LANGUAGES = ["en", "es"]
 DEFAULT_LANGUAGE = "en"
 
 # File paths
-STATIC_DIR = "app/static"
+STATIC_DIR = "/app/app/static"
 TEMPLATES_DIR = "app/templates" 
 LOCALES_DIR = "app/locales"
 

@@ -3,6 +3,22 @@ from datetime import datetime
 from typing import Optional, List
 from uuid import UUID
 from .booking import BookingType, BookingStatus, TripStatus, TodoCategory
+from .shared_trip import SharedTrip
+# SharedTrip schemas
+class SharedTripBase(BaseModel):
+    trip_id: UUID
+    email: str
+    invited_by: Optional[str] = None
+
+class SharedTripCreate(SharedTripBase):
+    pass
+
+class SharedTripResponse(SharedTripBase):
+    id: UUID
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
 
 # User schemas
 class UserBase(BaseModel):

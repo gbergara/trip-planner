@@ -5,7 +5,7 @@ from alembic import op
 import sqlalchemy as sa
 import uuid
 
-revision = 'add_allowed_google_accounts'
+revision = '002_add_allowed_google_accounts'
 down_revision = '001_initial_schema_with_timezone'
 branch_labels = None
 depends_on = None

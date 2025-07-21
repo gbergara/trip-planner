@@ -4,11 +4,185 @@ let currentTrips = [];
 let editingTripId = null;
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+
     loadTrips();
     setupEventListeners();
     checkUrlActions();
+
+    // Tab switching logic
+    const sharedTripsTab = document.getElementById('shared-trips-tab');
+    if (sharedTripsTab) {
+        sharedTripsTab.addEventListener('shown.bs.tab', function () {
+            loadSharedTrips();
+        });
+    }
+    // Optionally, load shared trips immediately if tab is active by default
+    if (document.getElementById('shared-trips').classList.contains('active')) {
+        loadSharedTrips();
+    }
+// Load shared trips
+async function loadSharedTrips() {
+    const container = document.getElementById('shared-trips-container');
+    container.innerHTML = `<div class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">${window.tripTranslations?.loading || 'Loading...'}</span>
+        </div>
+    </div>`;
+    try {
+        const sharedTrips = await TripPlanner.api.get('/trips/shared');
+        // Mark trips as shared
+        sharedTrips.forEach(trip => trip.is_shared = true);
+        displaySharedTrips(sharedTrips);
+    } catch (error) {
+        container.innerHTML = `<div class="empty-state">
+            <i class="bi bi-exclamation-triangle"></i>
+            <p>Error loading shared trips. Please try again.</p>
+            <button class="btn btn-primary" onclick="loadSharedTrips()">Retry</button>
+        </div>`;
+        TripPlanner.showAlert('Failed to load shared trips: ' + error.message, 'danger');
+    }
+}
+
+// Display shared trips in the container
+function displaySharedTrips(trips) {
+    const container = document.getElementById('shared-trips-container');
+    if (trips.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="bi bi-share"></i>
+                <h5>No shared trips yet</h5>
+                <p>Trips shared with you by other users will appear here.</p>
+            </div>
+        `;
+        return;
+    }
+    const tripsHtml = trips.map(trip => createSharedTripCard(trip)).join('');
+    container.innerHTML = tripsHtml;
+}
+
+// Create HTML for a shared trip card (read-only, no edit/delete/share)
+function createSharedTripCard(trip) {
+    const startDate = new Date(trip.start_date);
+    const endDate = new Date(trip.end_date);
+    const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+    const daysUntil = Math.ceil((startDate - new Date()) / (1000 * 60 * 60 * 24));
+    let durationStr = '';
+    if (window.tripTranslations) {
+        if (duration === 1) {
+            durationStr = window.tripTranslations.daySingular || 'day';
+        } else {
+            durationStr = window.tripTranslations.dayPlural || 'days';
+        }
+    } else {
+        durationStr = duration === 1 ? 'day' : 'days';
+    }
+    const tripIdStr = String(trip.id);
+    return `
+        <div class="trip-item trip-status-${trip.status}" data-trip-id="${tripIdStr}">
+            <div class="row align-items-center">
+                <div class="col-md-1">
+                    <div class="text-center">
+                        <i class="bi bi-share fs-2 text-success"></i>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h5 class="mb-1">
+                        <a href="/trips/${tripIdStr}/bookings" class="text-decoration-none text-primary fw-bold">${trip.name}</a>
+                    </h5>
+                    <div class="trip-details">
+                        <div class="mb-1">
+                            <i class="bi bi-calendar me-1"></i>
+                            <span class="date-display">
+                                ${TripPlanner.formatDate(trip.start_date)} - ${TripPlanner.formatDate(trip.end_date)}
+                                <small class="text-muted">(${duration} ${durationStr})</small>
+                            </span>
+                        </div>
+                        ${trip.primary_destination ? `
+                            <div class="mb-1">
+                                <i class="bi bi-geo-alt me-1"></i>
+                                ${trip.primary_destination}
+                            </div>
+                        ` : ''}
+                        ${trip.traveler_count > 1 ? `
+                            <div class="mb-1">
+                                <i class="bi bi-people me-1"></i>
+                                ${trip.traveler_count} ${window.tripTranslations?.travelers || 'travelers'}
+                            </div>
+                        ` : ''}
+                        ${trip.description ? `
+                            <div class="mb-1">
+                                <i class="bi bi-info-circle me-1"></i>
+                                ${trip.description}
+                            </div>
+                        ` : ''}
+                        ${daysUntil > 0 ? `
+                            <div class="mb-1">
+                                <i class="bi bi-clock me-1"></i>
+                                <span class="text-info">${daysUntil} ${window.tripTranslations?.daysUntilDeparture || 'days until departure'}</span>
+                            </div>
+                        ` : daysUntil < -duration ? `
+                            <div class="mb-1">
+                                <i class="bi bi-check-circle me-1"></i>
+                                <span class="text-success">${window.tripTranslations?.tripCompleted || 'Trip completed'}</span>
+                            </div>
+                        ` : daysUntil <= 0 ? `
+                            <div class="mb-1">
+                                <i class="bi bi-airplane me-1"></i>
+                                <span class="text-warning">${window.tripTranslations?.tripInProgress || 'Trip in progress!'}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="mb-2">
+                        <span class="status-badge status-${trip.status}">
+                            ${trip.status.replace('_', ' ').toUpperCase()}
+                        </span>
+                    </div>
+                    ${trip.budget ? `
+                        <div class="price-display">
+                            ${window.tripTranslations?.budget || 'Budget:'} ${TripPlanner.formatPrice(trip.budget, trip.currency)}
+                        </div>
+                    ` : ''}
+                    <div class="small text-muted mt-1">
+                        ${window.tripTranslations?.created || 'Created'} ${TripPlanner.formatDate(trip.created_at)}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+    // Share modal form submission
+    const shareForm = document.getElementById('shareTripForm');
+    if (shareForm) {
+        shareForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const email = document.getElementById('shareEmail').value;
+            try {
+                await TripPlanner.api.post(`/trips/${currentShareTripId}/share`, { trip_id: currentShareTripId, email });
+                loadSharedUsers(currentShareTripId);
+                TripPlanner.showAlert('Trip shared!', 'success');
+            } catch (err) {
+                TripPlanner.showAlert('Failed to share trip: ' + err.message, 'danger');
+            }
+        });
+    }
 });
+
+// Utility function for debouncing search input (global scope)
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
 // Setup event listeners
 function setupEventListeners() {
@@ -26,7 +200,7 @@ function checkUrlActions() {
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
     const tripId = urlParams.get('id') || sessionStorage.getItem('editTripId');
-    
+
     if (action === 'new') {
         const modal = new bootstrap.Modal(document.getElementById('tripModal'));
         modal.show();
@@ -46,9 +220,10 @@ function checkUrlActions() {
 // Load all trips
 async function loadTrips() {
     const container = document.getElementById('trips-container');
-    
     try {
         currentTrips = await TripPlanner.api.get('/trips/');
+        // Mark trips as not shared (owned)
+        currentTrips.forEach(trip => trip.is_shared = false);
         displayTrips(currentTrips);
     } catch (error) {
         console.error('Error loading trips:', error);
@@ -66,7 +241,7 @@ async function loadTrips() {
 // Display trips in the container
 function displayTrips(trips) {
     const container = document.getElementById('trips-container');
-    
+
     if (trips.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -91,7 +266,6 @@ function createTripCard(trip) {
     const endDate = new Date(trip.end_date);
     const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
     const daysUntil = Math.ceil((startDate - new Date()) / (1000 * 60 * 60 * 24));
-    // Pluralize day(s) for duration
     let durationStr = '';
     if (window.tripTranslations) {
         if (duration === 1) {
@@ -102,10 +276,7 @@ function createTripCard(trip) {
     } else {
         durationStr = duration === 1 ? 'day' : 'days';
     }
-    
-    // Ensure trip.id is always treated as string for large integers
     const tripIdStr = String(trip.id);
-    
     return `
         <div class="trip-item trip-status-${trip.status}" data-trip-id="${tripIdStr}">
             <div class="row align-items-center">
@@ -119,6 +290,9 @@ function createTripCard(trip) {
                         <a href="/trips/${tripIdStr}/bookings" class="text-decoration-none text-primary fw-bold">${trip.name}</a>
                         <button class="btn btn-sm btn-outline-primary ms-2" onclick="viewTripBookings('${tripIdStr}')" title="${window.tripTranslations?.viewBookings || 'View Bookings'}">
                             <i class="bi bi-calendar-check"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary ms-2" onclick="openShareModal('${tripIdStr}')" title="Share Trip" ${trip.is_shared ? 'disabled' : ''}>
+                            <i class="bi bi-share"></i> Share
                         </button>
                     </h5>
                     <div class="trip-details">
@@ -180,27 +354,27 @@ function createTripCard(trip) {
                         ${window.tripTranslations?.created || 'Created'} ${TripPlanner.formatDate(trip.created_at)}
                     </div>
                 </div>
-                                 <div class="col-md-2 text-end">
-                     <button class="btn-action btn-edit" onclick="editTrip('${tripIdStr}')" title="${window.tripTranslations?.editTrip || 'Edit Trip'}">
-                         <i class="bi bi-pencil"></i>
-                     </button>
-                     <button class="btn-action btn-delete" onclick="deleteTrip('${tripIdStr}')" title="${window.tripTranslations?.deleteTrip || 'Delete Trip'}">
-                         <i class="bi bi-trash"></i>
-                     </button>
-                 </div>
+                <div class="col-md-2 text-end">
+                    <button class="btn-action btn-edit" onclick="editTrip('${tripIdStr}')" title="${window.tripTranslations?.editTrip || 'Edit Trip'}" ${trip.is_shared ? 'disabled' : ''}>
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="deleteTrip('${tripIdStr}')" title="${window.tripTranslations?.deleteTrip || 'Delete Trip'}" ${trip.is_shared ? 'disabled' : ''}>
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             </div>
         </div>
     `;
 }
 
-// Filter and sort trips
+// Filter and sort trips (global scope)
 function filterTrips() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
     const statusFilter = document.getElementById('filterStatus').value;
     const sortBy = document.getElementById('sortBy').value;
 
     let filtered = currentTrips.filter(trip => {
-        const matchesSearch = !searchTerm || 
+        const matchesSearch = !searchTerm ||
             trip.name.toLowerCase().includes(searchTerm) ||
             trip.description?.toLowerCase().includes(searchTerm) ||
             trip.primary_destination?.toLowerCase().includes(searchTerm);
@@ -228,38 +402,14 @@ function filterTrips() {
     displayTrips(filtered);
 }
 
-// Clear all filters
-function clearFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('filterStatus').value = '';
-    document.getElementById('sortBy').value = 'created_at';
-    displayTrips(currentTrips);
-}
-
-// Reset trip form
-function resetTripForm() {
-    editingTripId = null;
-    document.getElementById('modalTitle').textContent = 'New Trip';
-    document.getElementById('submitButton').textContent = 'Create Trip';
-    document.getElementById('tripForm').reset();
-    
-    // Set default dates (today and tomorrow)
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    document.getElementById('start_date').value = today.toISOString().split('T')[0];
-    document.getElementById('end_date').value = tomorrow.toISOString().split('T')[0];
-}
-
-// Handle form submission
+// Handle form submission (global scope)
 async function handleTripSubmit(event) {
     event.preventDefault();
-    
+
     const form = event.target;
     const submitButton = document.getElementById('submitButton');
     const formData = new FormData(form);
-    
+
     // Convert form data to object
     const tripData = {};
     for (const [key, value] of formData.entries()) {
@@ -309,90 +459,41 @@ async function handleTripSubmit(event) {
     }
 }
 
-// Edit trip
-async function editTrip(tripId) {
+// Trip sharing logic (global scope)
+let currentShareTripId = null;
+window.openShareModal = function (tripId) {
+    currentShareTripId = tripId;
+    document.getElementById('shareEmail').value = '';
+    loadSharedUsers(tripId);
+    new bootstrap.Modal(document.getElementById('shareTripModal')).show();
+}
+
+async function loadSharedUsers(tripId) {
+    const list = document.getElementById('sharedUsersList');
+    list.innerHTML = 'Loading...';
     try {
-        // Ensure tripId is treated as string to avoid JavaScript number precision issues
-        const tripIdStr = String(tripId);
-        
-        const trip = await TripPlanner.api.get(`/trips/${tripIdStr}`);
-        
-        editingTripId = tripIdStr;
-        document.getElementById('modalTitle').textContent = 'Edit Trip';
-        document.getElementById('submitButton').textContent = 'Update Trip';
-        
-        // Populate form
-        populateForm(trip);
-        
-        // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('tripModal'));
-        modal.show();
-        
-    } catch (error) {
-        console.error('Error loading trip for edit:', error);
-        TripPlanner.showAlert('Failed to load trip details: ' + error.message, 'danger');
-    }
-}
-
-// Populate form with trip data
-function populateForm(trip) {
-    document.getElementById('name').value = trip.name || '';
-    document.getElementById('status').value = trip.status || 'planning';
-    document.getElementById('primary_destination').value = trip.primary_destination || '';
-    document.getElementById('traveler_count').value = trip.traveler_count || 1;
-    document.getElementById('budget').value = trip.budget || '';
-    document.getElementById('currency').value = trip.currency || 'USD';
-    document.getElementById('description').value = trip.description || '';
-    document.getElementById('destinations').value = trip.destinations || '';
-    document.getElementById('notes').value = trip.notes || '';
-    
-    // Convert dates back to local date format
-    if (trip.start_date) {
-        const startDate = new Date(trip.start_date);
-        document.getElementById('start_date').value = startDate.toISOString().split('T')[0];
-    }
-    if (trip.end_date) {
-        const endDate = new Date(trip.end_date);
-        document.getElementById('end_date').value = endDate.toISOString().split('T')[0];
-    }
-}
-
-// Delete trip
-function deleteTrip(tripId) {
-    const tripIdStr = String(tripId);
-    const trip = currentTrips.find(t => String(t.id) === tripIdStr);
-    const tripName = trip ? trip.name : 'this trip';
-    
-    TripPlanner.confirm(
-        `Are you sure you want to delete "${tripName}"? This will also delete all associated bookings. This action cannot be undone.`,
-        async () => {
-            try {
-                const response = await TripPlanner.api.delete(`/trips/${tripIdStr}`);
-                TripPlanner.showAlert(response.message || 'Trip deleted successfully!', 'success');
-                await loadTrips();
-            } catch (error) {
-                console.error('Error deleting trip:', error);
-                TripPlanner.showAlert('Failed to delete trip: ' + error.message, 'danger');
-            }
+        const shared = await TripPlanner.api.get(`/trips/${tripId}/shared-users`);
+        if (shared.length) {
+            list.innerHTML = shared.map(email => `
+            <div>
+                ${email}
+                <button class="btn btn-sm btn-danger ms-2" onclick="removeSharedUser('${tripId}', '${email}')">Remove</button>
+            </div>
+        `).join('');
+        } else {
+            list.innerHTML = '<em>No users shared yet.</em>';
         }
-    );
+    } catch (e) {
+        list.innerHTML = 'Failed to load shared users.';
+    }
 }
 
-// View trip bookings
-function viewTripBookings(tripId) {
-    const tripIdStr = String(tripId);
-    window.location.href = `/trips/${tripIdStr}/bookings`;
+window.removeSharedUser = async function (tripId, email) {
+    try {
+        await TripPlanner.api.delete(`/trips/${tripId}/share/${encodeURIComponent(email)}`);
+        loadSharedUsers(tripId);
+        TripPlanner.showAlert('Sharing removed.', 'success');
+    } catch (err) {
+        TripPlanner.showAlert('Failed to remove sharing: ' + err.message, 'danger');
+    }
 }
-
-// Utility function for debouncing search input
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-} 

@@ -218,14 +218,28 @@ async def trip_bookings_page(
     """Trip bookings management page (for authenticated users and guests)"""
     language = get_user_language(request)
     
-    # Get the trip details - check ownership (user or guest session)
+    # Get the trip details - check ownership (user or guest session or shared)
+    trip = None
+    can_edit = False
     if current_user:
         trip = db.query(Trip).filter(
             Trip.id == trip_id,
             Trip.user_id == current_user.id
         ).first()
+        if trip:
+            can_edit = True
+        else:
+            # Check if trip is shared with this user (case-insensitive, trimmed)
+            user_email = (current_user.email or '').strip().lower()
+            from .models.shared_trip import SharedTrip
+            shared = db.query(SharedTrip).filter(
+                SharedTrip.trip_id == trip_id,
+                SharedTrip.email.ilike(user_email)
+            ).first()
+            if shared:
+                trip = db.query(Trip).filter(Trip.id == trip_id).first()
+                can_edit = False
     else:
-        # For guest users, we need to import session service
         from .services.session_service import session_service
         guest_session_id = session_service.get_guest_session(request)
         if guest_session_id:
@@ -233,16 +247,15 @@ async def trip_bookings_page(
                 Trip.id == trip_id,
                 Trip.guest_session_id == guest_session_id
             ).first()
-        else:
-            trip = None
-    
+            can_edit = True if trip else False
     if not trip:
         raise HTTPException(status_code=404, detail="Trip not found")
-    
+
     return templates.TemplateResponse("trip_bookings.html", {
-        "request": request, 
+        "request": request,
         "trip": trip,
         "current_user": current_user,
+        "can_edit": can_edit,
         "language": language,
         "languages": get_language_names(),
         "_": lambda text: _(text, language),

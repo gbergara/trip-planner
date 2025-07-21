@@ -1,8 +1,4 @@
-"""
-Trips router for managing trip data.
 
-This module provides CRUD operations for trips.
-"""
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.responses import FileResponse
@@ -14,14 +10,118 @@ from datetime import datetime
 from ..core.database import get_db
 from ..models.booking import Trip, Booking, Todo, TodoCategory
 from ..models.user import User
-from ..models import TripCreate, TripUpdate, TripResponse, BookingResponse, TodoCreate, TodoUpdate, TodoResponse
+from ..models import TripCreate, TripUpdate, TripResponse, BookingResponse, TodoCreate, TodoUpdate, TodoResponse, SharedTripCreate, SharedTripResponse
+from ..models.shared_trip import SharedTrip
 from .auth import get_current_user_optional
 from ..services.session_service import session_service
 
 router = APIRouter(
-    prefix="/trips", 
+    prefix="/trips",
     tags=["trips"]
 )
+
+# ...existing code...
+
+# All endpoints must be registered on this router, with no duplicate or misplaced code below.
+
+# All endpoints must be below this line:
+
+
+
+# (Removed duplicate router and duplicate endpoint definitions)
+# Remove a shared user from a trip
+@router.delete("/{trip_id}/share/{email}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_shared_trip(
+    trip_id: UUID,
+    email: str,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """
+    Remove a shared user (by email) from a trip. Only the trip owner can remove sharing.
+    """
+    trip = db.query(Trip).filter(Trip.id == trip_id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    if not current_user or trip.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to modify sharing for this trip")
+    shared = db.query(SharedTrip).filter(SharedTrip.trip_id == trip_id, SharedTrip.email == email).first()
+    if not shared:
+        raise HTTPException(status_code=404, detail="Shared user not found for this trip")
+    db.delete(shared)
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+# List all users (emails) a trip is shared with
+@router.get("/{trip_id}/shared-users", response_model=List[str])
+def list_shared_users(
+    trip_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """
+    List all user emails a trip is shared with. Only the trip owner can view this list.
+    """
+    trip = db.query(Trip).filter(Trip.id == trip_id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    if not current_user or trip.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to view shared users for this trip")
+    shared_users = db.query(SharedTrip.email).filter(SharedTrip.trip_id == trip_id).all()
+    return [row[0] for row in shared_users]
+
+# Share a trip with another user by email
+@router.post("/{trip_id}/share", response_model=SharedTripResponse, status_code=status.HTTP_201_CREATED)
+def share_trip(
+    trip_id: UUID,
+    payload: SharedTripCreate,
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """
+    Share a trip with another user by email.
+    Only the trip owner can share their trip.
+    """
+    # Check trip ownership
+    trip = db.query(Trip).filter(Trip.id == trip_id).first()
+    if not trip:
+        raise HTTPException(status_code=404, detail="Trip not found")
+    if not current_user or trip.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to share this trip")
+
+    # Prevent duplicate sharing
+    existing = db.query(SharedTrip).filter(SharedTrip.trip_id == trip_id, SharedTrip.email == payload.email).first()
+    if existing:
+        raise HTTPException(status_code=409, detail="Trip already shared with this email")
+
+    shared = SharedTrip(
+        trip_id=trip_id,
+        email=payload.email,
+        invited_by=current_user.email if current_user else None
+    )
+    db.add(shared)
+    db.commit()
+    db.refresh(shared)
+    return shared
+
+# List trips shared with the current user
+@router.get("/shared", response_model=List[TripResponse])
+def list_shared_trips(
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional)
+):
+    """
+    List all trips shared with the current user (by email).
+    """
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    user_email = (current_user.email or '').strip().lower()
+    shared_trip_ids = db.query(SharedTrip.trip_id).filter(SharedTrip.email.ilike(user_email)).all()
+    trip_ids = [row[0] for row in shared_trip_ids]
+    if not trip_ids:
+        return []
+    trips = db.query(Trip).filter(Trip.id.in_(trip_ids)).all()
+    return trips
 
 
 @router.post("/", response_model=TripResponse, status_code=status.HTTP_201_CREATED)
@@ -114,31 +214,42 @@ def get_trip(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
-    """
-    Get detailed information for a specific trip.
-    
-    **Security**: Only returns trips belonging to the current user or guest session.
-    **UUID Format**: trip_id must be a valid UUID string.
-    """
+    print(f"[DEBUG] get_trip called for trip_id={trip_id}, user={getattr(current_user, 'email', None)}", flush=True)
+    trip = None
+    print(f"[DEBUG] get_trip: trip_id={trip_id}, user={getattr(current_user, 'email', None)}", flush=True)
     if current_user:
         # Authenticated user - check their trips
         trip = db.query(Trip).filter(
             Trip.id == trip_id, 
             Trip.user_id == current_user.id
         ).first()
+        print(f"[DEBUG] get_trip: owned trip found? {bool(trip)}", flush=True)
+        if not trip:
+            print(f"[DEBUG] get_trip: not owned, checking shared...", flush=True)
+            user_email = (current_user.email or '').strip().lower()
+            shared = db.query(SharedTrip).filter(
+                SharedTrip.trip_id == trip_id,
+                SharedTrip.email.ilike(user_email)
+            ).first()
+            print(f"[DEBUG] get_trip: shared trip found? {bool(shared)} (email checked: '{user_email}')", flush=True)
+            if shared:
+                trip = db.query(Trip).filter(Trip.id == trip_id).first()
+                print(f"[DEBUG] get_trip: trip found via sharing? {bool(trip)}", flush=True)
+            else:
+                print(f"[DEBUG] get_trip: not found in shared trips", flush=True)
+        else:
+            print(f"[DEBUG] get_trip: trip found as owner", flush=True)
     else:
-        # Guest user - check their session trips
-        guest_session_id = session_service.get_or_create_guest_session(request, response)
-        trip = db.query(Trip).filter(
-            Trip.id == trip_id,
-            Trip.guest_session_id == guest_session_id
-        ).first()
-    
+        # If not authenticated, do not allow access to shared trips
+        print(f"[DEBUG] get_trip: user not authenticated, cannot access shared trips", flush=True)
+        raise HTTPException(status_code=401, detail="Authentication required to access shared trips")
     if trip is None:
+        print(f"[DEBUG] get_trip: trip not found, raising 404", flush=True)
         raise HTTPException(status_code=404, detail="Trip not found")
+    print(f"[DEBUG] get_trip: returning trip {trip.id}", flush=True)
     return trip
-
-
+    return trip
+    # Remove duplicate unreachable code after return
 @router.get("/{trip_id}/bookings", response_model=List[BookingResponse])
 def get_trip_bookings(
     trip_id: UUID,
@@ -147,6 +258,7 @@ def get_trip_bookings(
     db: Session = Depends(get_db),
     current_user: Optional[User] = Depends(get_current_user_optional)
 ):
+    print(f"[DEBUG] get_trip_bookings called for trip_id={trip_id}", flush=True)
     """
     Get all bookings associated with a specific trip.
     
@@ -157,67 +269,39 @@ def get_trip_bookings(
     
     **Use Case**: Primary endpoint for trip booking management pages.
     """
+    trip = None
+    print(f"[DEBUG] get_trip_bookings: trip_id={trip_id}, user={getattr(current_user, 'email', None)}", flush=True)
     if current_user:
         trip = db.query(Trip).filter(
             Trip.id == trip_id, 
             Trip.user_id == current_user.id
         ).first()
+        print(f"[DEBUG] get_trip_bookings: owned trip found? {bool(trip)}", flush=True)
+        if not trip:
+            print(f"[DEBUG] get_trip_bookings: not owned, checking shared...", flush=True)
+            user_email = (current_user.email or '').strip().lower()
+            shared = db.query(SharedTrip).filter(
+                SharedTrip.trip_id == trip_id,
+                SharedTrip.email.ilike(user_email)
+            ).first()
+            print(f"[DEBUG] get_trip_bookings: shared record found? {bool(shared)} (email checked: '{user_email}')", flush=True)
+            if shared:
+                trip = db.query(Trip).filter(Trip.id == trip_id).first()
+                print(f"[DEBUG] get_trip_bookings: trip found via sharing? {bool(trip)}", flush=True)
+            else:
+                print(f"[DEBUG] get_trip_bookings: not found in shared trips", flush=True)
+        else:
+            print(f"[DEBUG] get_trip_bookings: trip found as owner", flush=True)
     else:
-        guest_session_id = session_service.get_or_create_guest_session(request, response)
-        trip = db.query(Trip).filter(
-            Trip.id == trip_id,
-            Trip.guest_session_id == guest_session_id
-        ).first()
-    
+        # If not authenticated, do not allow access to shared trips
+        print(f"[DEBUG] get_trip_bookings: user not authenticated, cannot access shared trips", flush=True)
+        raise HTTPException(status_code=401, detail="Authentication required to access shared trips")
     if not trip:
+        print(f"[DEBUG] get_trip_bookings: trip not found, raising 404", flush=True)
         raise HTTPException(status_code=404, detail="Trip not found")
-    
     bookings = db.query(Booking).filter(Booking.trip_id == trip_id).all()
+    print(f"[DEBUG] get_trip_bookings: returning {len(bookings)} bookings", flush=True)
     return bookings
-
-
-@router.put("/{trip_id}", response_model=TripResponse)
-def update_trip(
-    trip_id: UUID, 
-    trip_update: TripUpdate,
-    request: Request,
-    response: Response,
-    db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional)
-):
-    """
-    Update an existing trip with partial field updates.
-    
-    **Features:**
-    - **Partial Updates**: Only specified fields are modified
-    - **Validation**: Automatic data validation and type checking
-    - **Security**: Only trip owner can update their trips
-    
-    **Updatable Fields**: All trip fields except ID and ownership
-    """
-    if current_user:
-        db_trip = db.query(Trip).filter(
-            Trip.id == trip_id, 
-            Trip.user_id == current_user.id
-        ).first()
-    else:
-        guest_session_id = session_service.get_or_create_guest_session(request, response)
-        db_trip = db.query(Trip).filter(
-            Trip.id == trip_id,
-            Trip.guest_session_id == guest_session_id
-        ).first()
-    
-    if db_trip is None:
-        raise HTTPException(status_code=404, detail="Trip not found")
-    
-    # Update trip with new data
-    update_data = trip_update.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(db_trip, field, value)
-    
-    db.commit()
-    db.refresh(db_trip)
-    return db_trip
 
 
 @router.delete("/{trip_id}")
@@ -383,15 +467,27 @@ def get_trip_todos(
     **Ordering**: High priority first, then by creation date.
     """
     # Find the trip and verify access
-    query = db.query(Trip)
+    db_trip = None
     if current_user:
-        query = query.filter(Trip.user_id == current_user.id)
+        db_trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.user_id == current_user.id
+        ).first()
+        if not db_trip:
+            # Check if trip is shared with this user (case-insensitive, trimmed)
+            user_email = (current_user.email or '').strip().lower()
+            shared = db.query(SharedTrip).filter(
+                SharedTrip.trip_id == trip_id,
+                SharedTrip.email.ilike(user_email)
+            ).first()
+            if shared:
+                db_trip = db.query(Trip).filter(Trip.id == trip_id).first()
     else:
-        # Guest user - verify by session
         guest_session_id = session_service.get_or_create_guest_session(request, response)
-        query = query.filter(Trip.guest_session_id == guest_session_id)
-    
-    db_trip = query.filter(Trip.id == trip_id).first()
+        db_trip = db.query(Trip).filter(
+            Trip.id == trip_id,
+            Trip.guest_session_id == guest_session_id
+        ).first()
     if db_trip is None:
         raise HTTPException(status_code=404, detail="Trip not found")
     
